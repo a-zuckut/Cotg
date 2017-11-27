@@ -76,4 +76,8 @@ public class City implements Serializable {
 	public int hashCode() {
 		return city_name.hashCode() + x_coord * 600 + y_coord;
 	}
+
+	public String simpleString() {
+		return city_name + " " + String.format("(%d, %d)", x_coord, y_coord);
+	}
 }

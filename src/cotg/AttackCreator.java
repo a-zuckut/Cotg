@@ -16,6 +16,8 @@ import cotg.wrappers.helper.Pair;
 
 public class AttackCreator {
 	// Static methods because will be utilized from main method
+	
+	public static final int attacks_per_castle = 6;
 
 	public static final int minimum_attacks_per_real_target = 6;
 	public static final int minimum_attacks_per_target = 7;
@@ -172,7 +174,7 @@ public class AttackCreator {
 		for (String s : reals) {
 			addToReal(real_attacks.size(), attacks, s);
 			boolean rand = random.nextBoolean();
-			int total = rand ? 5 : 6;
+			int total = rand ? attacks_per_castle - 1 : attacks_per_castle;
 			for (int i = 0; i < total; i++) {
 				addToFake(real_attacks.size(), attacks, "f" + s);
 			}
@@ -181,7 +183,7 @@ public class AttackCreator {
 		// next add fakes - fun!
 		for (String s : pure_fakes) {
 			boolean rand = random.nextBoolean();
-			int total = rand ? 6 : 7;
+			int total = rand ? attacks_per_castle : attacks_per_castle + 1;
 			for (int i = 0; i < total; i++) {
 				addFakes(attacks, s);
 			}
@@ -276,12 +278,48 @@ public class AttackCreator {
 		for (City c : targets)
 			System.out.println(c);
 	}
+	
+	public static void printDetailedTargets(Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> t) {
+		for(String attacker: t.keySet()) {
+			System.out.println(attacker);
+			
+			Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>> curr = t.get(attacker);
+			ArrayList<ArrayList<Pair<String, City>>> reals = curr.p1;
+			ArrayList<ArrayList<Pair<String, City>>> fakes = curr.p2;
+			
+			System.out.println("REALS");
+			
+			for(ArrayList<Pair<String, City>> r : reals) {
+				String line = "\t";
+				for(Pair<String, City> c : r) {
+					line+=c.p1 + " " + c.p2.simpleString() + ", ";
+				}
+				
+				System.out.println(line);
+			}
+			
+			System.out.println("\nFAKES");
+			
+			for(ArrayList<Pair<String, City>> r : fakes) {
+				String line = "\t";
+				for(Pair<String, City> c : r) {
+					line+=c.p1 + " " + c.p2.simpleString() + ", ";
+				}
+				
+				System.out.println(line);
+			}
+		}
+	}
+	
+	public static void printSimpleTargets(Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> t) {
+		
+	}
 
 	public static void main(String[] args) {
 		Map<String, Pair<Integer, Integer>> attackers = new HashMap<>();
 		attackers.put("888", new Pair<Integer, Integer>(24, 12));
 		attackers.put("Byz", new Pair<Integer, Integer>(0,12));
-		System.out.println(getWaterTargetsByNameAndContinent(attackers, 23, "azuckut"));
+		printDetailedTargets(getWaterTargetsByNameAndContinent(attackers, 23, "azuckut"));
 	}
 
 }
