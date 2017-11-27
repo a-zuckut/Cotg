@@ -16,7 +16,7 @@ public class Constants {
 		try {
 			curr_alliances = getAllianceFromFile(alliance_file);
 			if(curr_alliances == null) {
-				curr_alliances = Parser.parseIntoAlliances("src/cotg/data/playerData.csv", 0);
+				curr_alliances = Parser.parseIntoAlliances("src/cotg/data/data.csv", 0);
 				Parser.storeData(curr_alliances);
 			}
 		} catch (Exception e) {
