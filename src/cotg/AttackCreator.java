@@ -25,19 +25,19 @@ public class AttackCreator {
 	private static final Random random = new Random();
 
 	public static Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> getWaterTargetsByNameAndContinent(
-			Map<String, Pair<Integer, Integer>> attackers, int continent, String... targetPlayers) {
+			Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers, int continent, String... targetPlayers) {
 		Pair<ArrayList<City>, ArrayList<City>> p = getRealsAndFakes(attackers, continent, targetPlayers);
 		return getTargets(attackers, p.p1, p.p2);
 	}
 
-	public static Pair<ArrayList<City>, ArrayList<City>> getRealsAndFakes(Map<String, Pair<Integer, Integer>> attackers,
-			int continent, String... targetPlayers) {
+	public static Pair<ArrayList<City>, ArrayList<City>> getRealsAndFakes(
+			Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers, int continent, String... targetPlayers) {
 		int reals_max = 0;
 		int fakes_max = 0;
 		for (String pid : attackers.keySet()) {
-			Pair<Integer, Integer> p = attackers.get(pid);
-			reals_max += p.pairOne();
-			fakes_max += p.pairTwo();
+			Pair<Pair<Integer, Integer>, Integer> p = attackers.get(pid);
+			reals_max += p.p1.p1 + p.p1.p2;
+			fakes_max += p.p2;
 		}
 
 		// Note that reals 0-pid1.p1 = reals for pid1 etc (same for fakes) (pid = player
@@ -71,53 +71,61 @@ public class AttackCreator {
 	}
 
 	public static Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> getTargets(
-			Map<String, Pair<Integer, Integer>> attackers, ArrayList<City> reals, ArrayList<City> fakes) {
+			Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers, ArrayList<City> reals,
+			ArrayList<City> fakes) {
 		int reals_max = 0;
 		int fakes_max = 0;
 		for (String pid : attackers.keySet()) {
-			Pair<Integer, Integer> p = attackers.get(pid);
-			reals_max += p.pairOne();
-			fakes_max += p.pairTwo();
+			Pair<Pair<Integer, Integer>, Integer> p = attackers.get(pid);
+			reals_max += p.p1.p1 + p.p1.p2;
+			fakes_max += p.p2;
 		}
 
 		String[] r2 = new String[reals_max];
 		String[] f2 = new String[fakes_max];
 
-		for (int i = 0; i < r2.length; i++)
+		for (int i = 0; i < r2.length; i++) {
 			r2[i] = "r" + i;
-		for (int i = 0; i < f2.length; i++)
+		}
+		for (int i = 0; i < f2.length; i++) {
 			f2[i] = "f" + i;
+		}
 
 		ArrayList<Pair<City, ArrayList<String>>> attacks = generateAttack(r2, f2, reals, fakes);
+
+		printArray(attacks);
+
 		return ChangeDataStructure(attackers, r2, f2, attacks);
 	}
 
 	private static Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> ChangeDataStructure(
-			Map<String, Pair<Integer, Integer>> attackers, String[] r2, String[] f2,
+			Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers, String[] r2, String[] f2,
 			ArrayList<Pair<City, ArrayList<String>>> attacks) {
 		Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> ret1 = new HashMap<>();
 
 		int curr_real_index = 0;
 		int curr_fake_index = 0;
 		for (String pid : attackers.keySet()) {
-			Pair<Integer, Integer> p = attackers.get(pid);
+			Pair<Pair<Integer, Integer>, Integer> p = attackers.get(pid);
 
 			ArrayList<ArrayList<Pair<String, City>>> res = new ArrayList<>();
 			ArrayList<ArrayList<Pair<String, City>>> fas = new ArrayList<>();
-			for (int i = curr_real_index; i < curr_real_index + p.p1; i++) {
+			for (int i = curr_real_index; i < curr_real_index + p.p1.p1 + p.p1.p2; i++) {
 				ArrayList<Pair<String, City>> re = new ArrayList<>();
 				String temp = r2[i];
 				for (Pair<City, ArrayList<String>> p1 : attacks) {
 					if (p1.p2.contains(temp)) {
-						re.add(new Pair<String, City>("REAL", p1.p1));
+						re.add(new Pair<String, City>("REAL " + ((i < curr_real_index + p.p1.p1) ? "WS" : "ASS"),
+								p1.p1));
 					}
 					if (p1.p2.contains("f" + temp)) {
-						re.add(new Pair<String, City>("FAKE", p1.p1));
+						re.add(new Pair<String, City>("FAKE " + ((i < curr_real_index + p.p1.p1) ? "WS" : "ASS"),
+								p1.p1));
 					}
 				}
 				res.add(re);
 			}
-			curr_real_index += p.p1;
+			curr_real_index += p.p1.p1 + p.p1.p2;
 
 			for (int i = curr_fake_index; i < curr_fake_index + p.p2; i++) {
 				ArrayList<Pair<String, City>> fa = new ArrayList<>();
@@ -274,9 +282,10 @@ public class AttackCreator {
 		}
 	}
 
-	private static void printArray(ArrayList<City> targets) {
-		for (City c : targets)
-			System.out.println(c);
+	private static void printArray(ArrayList<Pair<City, ArrayList<String>>> attacks) {
+		for (Pair<City, ArrayList<String>> c : attacks) {
+			System.out.println(c.toString());
+		}
 	}
 
 	public static void printDetailedTargets(
@@ -330,10 +339,13 @@ public class AttackCreator {
 				String r9 = "";
 				String f9 = "";
 				for (Pair<String, City> c : r) {
-					if (c.p1.equals("REAL"))
-						r9 += c.p2.simpleString() + ", ";
-					else
-						f9 += c.p2.simpleString() + ", ";
+					if (c.p1.contains("REAL")) {
+						String x = c.p1.replace("REAL", "").trim();
+						r9 += x + " " + c.p2.simpleString() + ", ";
+					} else {
+						String x = c.p1.replace("FAKE", "").trim();
+						f9 += x + " " + c.p2.simpleString() + ", ";
+					}
 				}
 
 				line += "REAL: " + r9 + "FAKE: " + f9;
@@ -355,10 +367,54 @@ public class AttackCreator {
 	}
 
 	public static void main(String[] args) {
-		Map<String, Pair<Integer, Integer>> attackers = new HashMap<>();
-		attackers.put("888", new Pair<Integer, Integer>(24, 12));
-		attackers.put("Byz", new Pair<Integer, Integer>(0, 12));
-		printSimpleTargets(getWaterTargetsByNameAndContinent(attackers, 23, "azuckut"));
+		Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers = new HashMap<>();
+		attackers.put("888", new Pair<Pair<Integer, Integer>, Integer>(new Pair<Integer, Integer>(6, 18), 12));
+		attackers.put("Byz", new Pair<>(new Pair<Integer, Integer>(0, 0), 12));
+		Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> waterTargetsByNameAndContinent = getWaterTargetsByNameAndContinent(
+				attackers, 23, "azuckut");
+		printSimpleTargets(waterTargetsByNameAndContinent);
+		
+		System.out.println("NEW ONE\n");
+		
+		printAttacksByTargets(waterTargetsByNameAndContinent);
+	}
+
+	private static void printAttacksByTargets(
+			Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> waterTargetsByNameAndContinent) {
+		Map<City, ArrayList<String>> temp = new HashMap<>();
+		for(Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>> x : waterTargetsByNameAndContinent.values()) {
+			for(ArrayList<Pair<String,City>> arr : x.p1) {
+				for(Pair<String,City> p : arr) {
+					if(!temp.containsKey(p.p2)) {
+						ArrayList<String> y = new ArrayList<>();
+						y.add(p.p1);
+						temp.put(p.p2, y);
+					} else {
+						temp.get(p.p2).add(p.p1);
+					}
+				}
+			}
+			
+			for(ArrayList<Pair<String,City>> arr : x.p2) {
+				for(Pair<String,City> p : arr) {
+					if(!temp.containsKey(p.p2)) {
+						ArrayList<String> y = new ArrayList<>();
+						y.add(p.p1);
+						temp.put(p.p2, y);
+					} else {
+						temp.get(p.p2).add(p.p1);
+					}
+				}
+			}
+		}
+		
+		printArray(temp);
+	}
+
+	public static void printArray(Map<City, ArrayList<String>> temp) {
+		for(City c : temp.keySet()) {
+			System.out.println(c + " " + temp.get(c));
+		}
 	}
 
 }

@@ -14,9 +14,6 @@ public class Pair<T, U> {
 		this.p2 = p2;
 	}
 	
-	public T pairOne() { return p1; }
-	public U pairTwo() { return p2; }
-	
 	public Pair<U,T> swap() {
 		return new Pair<U,T>(p2,p1);
 	}
