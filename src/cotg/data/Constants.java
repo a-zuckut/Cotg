@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 
 import cotg.Parser;
 import cotg.wrappers.Alliance;
+import cotg.wrappers.Player;
 
 public class Constants {
 
@@ -16,7 +17,8 @@ public class Constants {
 		try {
 			curr_alliances = getAllianceFromFile(alliance_file);
 			if(curr_alliances == null) {
-				curr_alliances = Parser.parseIntoAlliances("src/cotg/data/data.csv", 0);
+				System.out.println("Parsing");
+				curr_alliances = Parser.parseIntoAlliances("src/cotg/data/playerData.csv", 0);
 				Parser.storeData(curr_alliances);
 			}
 		} catch (Exception e) {
@@ -34,6 +36,29 @@ public class Constants {
 		fis.close();
 		System.out.println("Map<Date, Double> obtained from file");
 		return e;
+	}
+	
+	public static void printAlliances() {
+		System.out.println("Printing alliances");
+		for(Alliance alliance : curr_alliances) {
+			System.out.println(alliance.name);
+		}
+	}
+	
+	public static void printAlliance(String s) {
+		Alliance alliance = findAlliance(s);
+		
+		System.out.println("Alliance: " + alliance.name + " with score of " + alliance.score);
+		for(Player player : alliance.players) {
+			System.out.println("\t" + player);
+		}
+	}
+	
+	private static Alliance findAlliance(String s) {
+		for(Alliance alliance : curr_alliances) {
+			if(alliance.name.equals(s)) return alliance;
+		}
+		return null;
 	}
 	
 }

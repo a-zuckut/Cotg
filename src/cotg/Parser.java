@@ -122,17 +122,17 @@ public class Parser {
 				for(String p : data.get(s1).keySet()) {
 					Player new_player = new Player(p, s1);
 					new_player.cities.addAll(data.get(s1).get(p));
+					new_player.generateScore();
 					if(!alliances[index].players.add(new_player)) {
-						// updates
-						Iterator<Player> it = alliances[index].players.iterator();
-						while(it.hasNext()) {
-							Player next = it.next();
-							if(next.name.equals(p)) {
-								next.cities.addAll(data.get(s1).get(p));
-							}
-						}
+						// updates by replacing... 
+						alliances[index].players.remove(new_player);
+						alliances[index].players.add(new_player);
+					} else {
+						System.out.println("Added new player");
+						alliances[index].players.add(new_player);
 					}
 				}
+				alliances[index].generateScore();
 			}
 		}
 	}
@@ -184,7 +184,7 @@ public class Parser {
 	}
 
 	public static void main(String[] args) {
-		print();
+		update("src/cotg/data/playerData.csv");
 	}
 
 }

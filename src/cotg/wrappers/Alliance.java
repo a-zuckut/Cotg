@@ -25,6 +25,7 @@ public class Alliance implements Serializable {
 	
 	@Override
 	public String toString() {
-		return String.format("%-50s", "\"" + name + "\"" + " with score: " + score) + "Players: " + players; 
+		generateScore();
+		return String.format("%-50s", "\"" + name + "\"" + " with score: " + generateScore()) + "Players: " + players; 
 	}
 }

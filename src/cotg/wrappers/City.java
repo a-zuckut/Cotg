@@ -74,7 +74,7 @@ public class City implements Serializable {
 	
 	@Override
 	public int hashCode() {
-		return city_name.hashCode() + x_coord * 600 + y_coord;
+		return x_coord * 600 + y_coord;
 	}
 
 	public String simpleString() {

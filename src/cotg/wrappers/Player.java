@@ -21,6 +21,7 @@ public class Player implements Serializable {
 	
 	public Player(String name) {
 		this.name = name;
+		generateScore();
 	}
 	
 	public int generateScore() {
@@ -34,20 +35,17 @@ public class Player implements Serializable {
 	public boolean equals(Object o) {
 		if(!(o instanceof Player)) return false;
 		Player com = (Player) o;
-		
-		if(cities == null) return com.name.equals(this.name);
-		
-		return com.alliance.equals(this.alliance) && this.name.equals(com.name) && this.cities.equals(com.cities);
+		return this.name.equals(com.name);
 	}
 	
 	@Override
 	public int hashCode() {
-		return name.hashCode();
+		return name.trim().hashCode();
 	}
 	
 	@Override
 	public String toString() {
-		return name + " has " + cities.size() + " cities " + "score = " + score;
+		return name + " has " + cities.size() + " cities " + "score = " + generateScore();
 	}
 	
 }
