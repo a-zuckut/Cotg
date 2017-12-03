@@ -48,12 +48,11 @@ public class Shrines {
 		}
 	}
 
-	public static void main(String[] args) {
-		Shrines shrines = new Shrines();
-		shrines.printShrinesOnOpenContinents();
+	static {
+		new Shrines();
 	}
 
-	private void printShrinesOnOpenContinents() {
+	public static void printShrinesOnOpenContinents() {
 		List<Entry<Integer, Set<Faith>>> list = new LinkedList<Map.Entry<Integer, Set<Faith>>>(
 				shrines_on_open_continents.entrySet());
 		Collections.sort(list, new Comparator<Map.Entry<Integer, Set<Faith>>>() {
