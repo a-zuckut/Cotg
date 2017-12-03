@@ -54,7 +54,7 @@ public class Constants {
 		}
 	}
 	
-	private static Alliance findAlliance(String s) {
+	public static Alliance findAlliance(String s) {
 		for(Alliance alliance : curr_alliances) {
 			if(alliance.name.equals(s)) return alliance;
 		}

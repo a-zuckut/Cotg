@@ -27,10 +27,9 @@ public class Parser {
 	 *            File name.
 	 * @return The file in form of Strings for each line in the file
 	 */
-	public static ArrayList<String> parseFiles(String string) {
+	public static ArrayList<String> parseFiles(File file) {
 		ArrayList<String> ret = new ArrayList<>();
 		try {
-			File file = new File(string);
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String x = null;
 			while ((x = br.readLine()) != null) {
@@ -185,6 +184,10 @@ public class Parser {
 
 	public static void main(String[] args) {
 		update("src/cotg/data/playerData.csv");
+	}
+
+	public static ArrayList<String> parseFiles(String file) {
+		return parseFiles(new File(file));
 	}
 
 }

@@ -1,7 +1,9 @@
 package cotg.wrappers;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Alliance implements Serializable {
@@ -10,6 +12,8 @@ public class Alliance implements Serializable {
 	public String name;
 	public int score;
 	public Set<Player> players;
+	
+	public Map<Integer, Integer> military_per_continent = new HashMap<>();
 	
 	public Alliance(String name) {
 		this.name = name;
