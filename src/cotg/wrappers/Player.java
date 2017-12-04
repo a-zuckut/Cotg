@@ -25,7 +25,7 @@ public class Player implements Serializable {
 	}
 	
 	public int generateScore() {
-		int sum = 0;
+		int sum = 0; if(cities==null) return 0;
 		for(City c : cities) sum+=c.score;
 		score = sum;
 		return sum;
@@ -46,6 +46,14 @@ public class Player implements Serializable {
 	@Override
 	public String toString() {
 		return name + " has " + cities.size() + " cities " + "score = " + generateScore();
+	}
+
+	public boolean onContinent(int continent) {
+		if(cities == null) return false;
+		for(City c : cities) {
+			if(c.continent == continent) return true;
+		}
+		return false;
 	}
 	
 }

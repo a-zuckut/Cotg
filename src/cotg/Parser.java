@@ -11,6 +11,8 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import cotg.data.Constants;
@@ -112,32 +114,76 @@ public class Parser {
 
 	public static void update(String s) {
 		Map<String, Map<String, ArrayList<City>>> data = parseIntoMaps(s);
-		
+
 		Alliance[] alliances = Constants.curr_alliances;
-		
-		for(String s1 : data.keySet()) {
+
+		for (String s1 : data.keySet()) {
 			int index = -1;
-			if((index = alliancesContains(s1)) != -1) {
-				for(String p : data.get(s1).keySet()) {
+			if ((index = alliancesContains(s1)) != -1) {
+				for (String p : data.get(s1).keySet()) {
 					Player new_player = new Player(p, s1);
 					new_player.cities.addAll(data.get(s1).get(p));
 					new_player.generateScore();
-					if(!alliances[index].players.add(new_player)) {
-						// updates by replacing... 
+
+					removePlayer(alliances, new_player, index);
+
+					if (!alliances[index].players.add(new_player)) {
+						// updates by replacing...
 						alliances[index].players.remove(new_player);
 						alliances[index].players.add(new_player);
 					} else {
-						System.out.println("Added new player");
+						System.out.println("Added new player " + new_player.name);
 						alliances[index].players.add(new_player);
 					}
 				}
 				alliances[index].generateScore();
 			}
 		}
+
+		Constants.curr_alliances = removeEmptyAlliances(alliances);
+		storeData(Constants.curr_alliances);
+	}
+
+	private static Alliance[] removeEmptyAlliances(Alliance[] alliances) {
+		int num = 0;
+		for (int i = 0; i < alliances.length; i++) {
+			if (alliances[i].players.isEmpty())
+				num++;
+		}
+
+		if (num == 0)
+			return alliances;
+
+		System.out.println("Removing " + num + " alliance(s).");
+
+		Alliance[] ret = new Alliance[alliances.length - num];
+
+		int index = 0;
+		for (Alliance alliance : alliances) {
+			if (!alliance.players.isEmpty())
+				ret[index++] = alliance;
+		}
+
+		return ret;
+	}
+
+	private static void removePlayer(Alliance[] alliances, Player new_player, int index) {
+		for (Alliance a : alliances) {
+			if (a.equals(alliances[index]))
+				continue;
+			List<Player> remove = new LinkedList<>();
+			for (Player player : a.players) {
+				if (player.equals(new_player)) {
+					remove.add(player);
+				}
+			}
+
+			a.players.removeAll(remove);
+		}
 	}
 
 	public static int alliancesContains(String alliance) {
-		for (int i = 0 ; i < Constants.curr_alliances.length ; i++) {
+		for (int i = 0; i < Constants.curr_alliances.length; i++) {
 			if (Constants.curr_alliances[i].name.equals(alliance.trim()))
 				return i;
 		}

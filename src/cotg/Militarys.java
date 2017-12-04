@@ -23,6 +23,8 @@ public class Militarys {
 	public static Map<Integer, Set<Pair<String, Integer>>> military_data;
 	public static final File FILE = new File("src/cotg/data/militaryData.csv");
 
+	public static final double PERCENT_INDICATING_CONTROL = .3;
+
 	public static void parseMilitariesData() {
 		ArrayList<String> ret = Parser.parseFiles(FILE);
 		military_data = new HashMap<Integer, Set<Pair<String, Integer>>>();
@@ -40,7 +42,7 @@ public class Militarys {
 			}
 		}
 	}
-	
+
 	static {
 		new Militarys();
 	}
@@ -48,20 +50,22 @@ public class Militarys {
 	public Militarys() {
 		parseMilitariesData();
 		loadControlledContinents();
+		// printAndLoadControlledContinents();
 	}
 
 	public static void addMilitariesToAlliances() {
-		for(Entry<Integer, Set<Pair<String, Integer>>> xEntry : military_data.entrySet()) {
-			for(Pair<String, Integer> t : xEntry.getValue()) {
+		for (Entry<Integer, Set<Pair<String, Integer>>> xEntry : military_data.entrySet()) {
+			for (Pair<String, Integer> t : xEntry.getValue()) {
 				Alliance alliance = Constants.findAlliance(t.p1);
-				if(alliance==null) continue;
+				if (alliance == null)
+					continue;
 				alliance.military_per_continent.put(xEntry.getKey(), t.p2);
 			}
 		}
 	}
-	
+
 	public static Map<Integer, String> allianceControlled;
-	
+
 	public static void printAndLoadControlledContinents() {
 		List<Entry<Integer, Set<Pair<String, Integer>>>> list = new LinkedList<>(military_data.entrySet());
 		allianceControlled = new HashMap<>();
@@ -76,30 +80,63 @@ public class Militarys {
 		for (Entry<Integer, Set<Pair<String, Integer>>> x : list) {
 			System.out.println("Continent " + x.getKey() + ":");
 			boolean comma = false;
+			boolean two = false;
 			List<Pair<String, Integer>> pa = new LinkedList<>(x.getValue());
 			int sum = 0;
-			for(Pair<String, Integer> summing : pa) {
+			for (Pair<String, Integer> summing : pa) {
 				sum += summing.p2;
 			}
-			
+
 			String one = "";
-			for(Pair<String, Integer> deciding : pa) {
-				if(deciding.p2.doubleValue()/((double)sum) > .30) {
+			for (Pair<String, Integer> deciding : pa) {
+				if (deciding.p2.doubleValue() / ((double) sum) >= PERCENT_INDICATING_CONTROL) {
 					if (comma) {
-						System.out.print(", " + deciding.p1);
+						System.out.print(", " + deciding.p1 + String.format(" %.2f", deciding.p2.doubleValue() / ((double) sum)));
+						two = true;
 					} else {
 						one = deciding.p1;
-						System.out.print(" " + deciding.p1);
+						System.out.print(" " + deciding.p1 + String.format(" %.2f", deciding.p2.doubleValue() / ((double) sum)));
 						comma = true;
 					}
 				}
 			}
 			System.out.println(".");
-			
-			if(comma) allianceControlled.put(x.getKey(), one);
+
+			if (!two)
+				allianceControlled.put(x.getKey(), one);
 		}
 	}
-	
+
+	public static void printAllianceControllingContinents() {
+		Set<String> alliances = new HashSet<>();
+		for (Entry<Integer, String> x : allianceControlled.entrySet()) {
+			alliances.add(x.getValue());
+		}
+
+		Map<String, ArrayList<Integer>> allianceToContinent = new HashMap<>();
+		for (String a : alliances) {
+			for (Entry<Integer, String> xEntry : allianceControlled.entrySet()) {
+				if (xEntry.getValue().equals(a)) {
+					if (allianceToContinent.containsKey(a)) {
+						allianceToContinent.get(a).add(xEntry.getKey());
+					} else {
+						allianceToContinent.put(a, new ArrayList<>());
+						allianceToContinent.get(a).add(xEntry.getKey());
+					}
+				}
+			}
+		}
+
+		System.out.println("Controlled Continents");
+		for (Entry<String, ArrayList<Integer>> e : allianceToContinent.entrySet()) {
+			System.out.print(e.getKey() + ": ");
+			for (Integer i : e.getValue()) {
+				System.out.print(i + " ");
+			}
+			System.out.println("");
+		}
+	}
+
 	public static void loadControlledContinents() {
 		List<Entry<Integer, Set<Pair<String, Integer>>>> list = new LinkedList<>(military_data.entrySet());
 		allianceControlled = new HashMap<>();
@@ -112,52 +149,58 @@ public class Militarys {
 		});
 		for (Entry<Integer, Set<Pair<String, Integer>>> x : list) {
 			boolean comma = false;
+			boolean two = false;
 			List<Pair<String, Integer>> pa = new LinkedList<>(x.getValue());
 			int sum = 0;
-			for(Pair<String, Integer> summing : pa) {
+			for (Pair<String, Integer> summing : pa) {
 				sum += summing.p2;
 			}
-			
+
 			String one = "";
-			for(Pair<String, Integer> deciding : pa) {
-				if(deciding.p2.doubleValue()/((double)sum) > .40) {
+			for (Pair<String, Integer> deciding : pa) {
+//				System.out.println("cont " + x.getKey() + ": " + deciding.p1 + " "
+//						+ String.format("%.2f", deciding.p2.doubleValue() / ((double) sum)));
+				if (deciding.p2.doubleValue() / ((double) sum) >= PERCENT_INDICATING_CONTROL) {
 					if (comma) {
+						two = true;
 					} else {
 						one = deciding.p1;
 						comma = true;
 					}
 				}
 			}
-			if(comma) allianceControlled.put(x.getKey(), one);
+
+			if (!two)
+				allianceControlled.put(x.getKey(), one);
 		}
 	}
 
 	public static void printAndLoadFaiths() {
-		printAndLoadControlledContinents();
 		// using allianceControlled and shrinesOnOpenContinents
 		Map<String, HashMap<Faith, Integer>> faiths = new HashMap<>();
-		for(Entry<Integer, String> entry : allianceControlled.entrySet()) {
+		for (Entry<Integer, String> entry : allianceControlled.entrySet()) {
 			Set<Faith> cont_faith = Shrines.shrines_on_open_continents.get(entry.getKey());
-			if(cont_faith == null) continue;
-			if(!faiths.containsKey(entry.getValue())) {
+			if (cont_faith == null)
+				continue;
+			if (!faiths.containsKey(entry.getValue())) {
 				faiths.put(entry.getValue(), new HashMap<Faith, Integer>());
 				insertFaiths(faiths.get(entry.getValue()), cont_faith);
 			} else {
 				insertFaiths(faiths.get(entry.getValue()), cont_faith);
 			}
 		}
-		
-		for(Entry<String, HashMap<Faith, Integer>> entry : faiths.entrySet()) {
+
+		for (Entry<String, HashMap<Faith, Integer>> entry : faiths.entrySet()) {
 			System.out.println("FOR ALLIANCE: " + entry.getKey());
-			for(Entry<Faith, Integer> entry2 : entry.getValue().entrySet()) {
+			for (Entry<Faith, Integer> entry2 : entry.getValue().entrySet()) {
 				System.out.println("\t" + entry2.getKey() + ": " + entry2.getValue());
 			}
 		}
 	}
 
 	private static void insertFaiths(HashMap<Faith, Integer> hashMap, Set<Faith> cont_faith) {
-		for(Faith f : cont_faith) {
-			if(hashMap.containsKey(f)) {
+		for (Faith f : cont_faith) {
+			if (hashMap.containsKey(f)) {
 				hashMap.put(f, hashMap.get(f) + 1);
 			} else {
 				hashMap.put(f, 1);
@@ -165,11 +208,7 @@ public class Militarys {
 		}
 	}
 
-	public static void main(String[] args) {
-		printAndLoadFaiths();
-	}
-
-	private static void printMilitariesPerContinent() {
+	public static void printMilitariesPerContinent() {
 		List<Entry<Integer, Set<Pair<String, Integer>>>> list = new LinkedList<>(military_data.entrySet());
 		Collections.sort(list, new Comparator<Map.Entry<Integer, Set<Pair<String, Integer>>>>() {
 			@Override
@@ -199,6 +238,12 @@ public class Militarys {
 
 			System.out.println(".");
 		}
+	}
+
+	public static void main(String[] args) {
+		printAndLoadFaiths();
+		Shrines.printShrinesOnOpenContinents();
+		printAllianceControllingContinents();
 	}
 
 }

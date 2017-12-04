@@ -24,6 +24,30 @@ public class AttackCreator {
 
 	private static final Random random = new Random();
 
+	public static Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> getWaterTargetsByAllianceAndContinent(
+			Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers, int continent, String alliance) {
+		ArrayList<String> playerList = new ArrayList<>();
+
+		Alliance a = Constants.findAlliance(alliance);
+		Set<Player> list = a.players;
+		Player[] players = new Player[list.size()];
+		list.toArray(players);
+
+		for (Player p : players) {
+			playerList.add(p.name);
+		}
+
+		String[] targets = new String[playerList.size()];
+		playerList.toArray(targets);
+		return getWaterTargetsByNameAndContinent(attackers, continent, targets);
+	}
+
+	public static void printArray(String[] players) {
+		for (String xString : players) {
+			System.out.print(xString + " ");
+		}
+	}
+
 	public static Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> getWaterTargetsByNameAndContinent(
 			Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers, int continent, String... targetPlayers) {
 		Pair<ArrayList<City>, ArrayList<City>> p = getRealsAndFakes(attackers, continent, targetPlayers);
@@ -40,7 +64,8 @@ public class AttackCreator {
 			fakes_max += p.p2;
 		}
 
-		// Note that reals 0-pid1.p1 = reals for pid1 etc (same for fakes) (pid = player
+		// Note that reals 0-pid1.p1 = reals for pid1 etc (same for fakes) (pid
+		// = player
 		// id 1) - first attacker
 		ArrayList<City> targets = getTargets(continent, targetPlayers);
 
@@ -366,26 +391,14 @@ public class AttackCreator {
 		}
 	}
 
-	public static void main(String[] args) {
-		Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers = new HashMap<>();
-		attackers.put("888", new Pair<Pair<Integer, Integer>, Integer>(new Pair<Integer, Integer>(6, 18), 12));
-		attackers.put("Byz", new Pair<>(new Pair<Integer, Integer>(0, 0), 12));
-		Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> waterTargetsByNameAndContinent = getWaterTargetsByNameAndContinent(
-				attackers, 23, "azuckut");
-		printSimpleTargets(waterTargetsByNameAndContinent);
-		
-		System.out.println("NEW ONE\n");
-		
-		printAttacksByTargets(waterTargetsByNameAndContinent);
-	}
-
-	private static void printAttacksByTargets(
+	public static void printAttacksByTargets(
 			Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> waterTargetsByNameAndContinent) {
 		Map<City, ArrayList<String>> temp = new HashMap<>();
-		for(Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>> x : waterTargetsByNameAndContinent.values()) {
-			for(ArrayList<Pair<String,City>> arr : x.p1) {
-				for(Pair<String,City> p : arr) {
-					if(!temp.containsKey(p.p2)) {
+		for (Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>> x : waterTargetsByNameAndContinent
+				.values()) {
+			for (ArrayList<Pair<String, City>> arr : x.p1) {
+				for (Pair<String, City> p : arr) {
+					if (!temp.containsKey(p.p2)) {
 						ArrayList<String> y = new ArrayList<>();
 						y.add(p.p1);
 						temp.put(p.p2, y);
@@ -394,10 +407,10 @@ public class AttackCreator {
 					}
 				}
 			}
-			
-			for(ArrayList<Pair<String,City>> arr : x.p2) {
-				for(Pair<String,City> p : arr) {
-					if(!temp.containsKey(p.p2)) {
+
+			for (ArrayList<Pair<String, City>> arr : x.p2) {
+				for (Pair<String, City> p : arr) {
+					if (!temp.containsKey(p.p2)) {
 						ArrayList<String> y = new ArrayList<>();
 						y.add(p.p1);
 						temp.put(p.p2, y);
@@ -407,14 +420,29 @@ public class AttackCreator {
 				}
 			}
 		}
-		
+
 		printArray(temp);
 	}
 
 	public static void printArray(Map<City, ArrayList<String>> temp) {
-		for(City c : temp.keySet()) {
+		for (City c : temp.keySet()) {
 			System.out.println(c + " " + temp.get(c));
 		}
+	}
+
+	public static void main(String[] args) {
+		Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers = new HashMap<>();
+		attackers.put("azuckut", new Pair<Pair<Integer, Integer>, Integer>(new Pair<Integer, Integer>(6, 18), 12));
+
+//		Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> waterTargetsByNameAndContinent = getWaterTargetsByAllianceAndContinent(
+//				attackers, 13, "Dirty Mastiff Cartel");
+		Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> waterTargetsByNameAndContinent = getWaterTargetsByNameAndContinent(
+				attackers, 13, "Fuzzle");
+		printSimpleTargets(waterTargetsByNameAndContinent);
+		//
+		// System.out.println("NEW ONE\n");
+		//
+		// printAttacksByTargets(waterTargetsByNameAndContinent);
 	}
 
 }
