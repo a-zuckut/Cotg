@@ -1,5 +1,6 @@
 package cotg;
 
+import java.awt.Container;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -174,6 +175,7 @@ public class Parser {
 			List<Player> remove = new LinkedList<>();
 			for (Player player : a.players) {
 				if (player.equals(new_player)) {
+					System.out.println("Removed player " + player + " in " + a.name);
 					remove.add(player);
 				}
 			}
@@ -230,6 +232,7 @@ public class Parser {
 
 	public static void main(String[] args) {
 		update("src/cotg/data/playerData.csv");
+		Constants.printWaterCastlesForPlayerOnContinent("OldShang", 43);
 	}
 
 	public static ArrayList<String> parseFiles(String file) {

@@ -17,10 +17,10 @@ import cotg.wrappers.helper.Pair;
 public class AttackCreator {
 	// Static methods because will be utilized from main method
 
-	public static final int attacks_per_castle = 6;
+	public static final int attacks_per_castle = 4;
 
-	public static final int minimum_attacks_per_real_target = 6;
-	public static final int minimum_attacks_per_target = 7;
+	public static final int minimum_attacks_per_real_target = 1;
+	public static final int minimum_attacks_per_target = 1;
 
 	private static final Random random = new Random();
 
@@ -431,13 +431,17 @@ public class AttackCreator {
 	}
 
 	public static void main(String[] args) {
+		// Pair<Pair<WS, ASSAULT>, FAKES>
 		Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers = new HashMap<>();
-		attackers.put("azuckut", new Pair<Pair<Integer, Integer>, Integer>(new Pair<Integer, Integer>(6, 18), 12));
+		attackers.put("azuckut", new Pair<Pair<Integer, Integer>, Integer>(new Pair<Integer, Integer>(0, 0), 10));
 
-//		Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> waterTargetsByNameAndContinent = getWaterTargetsByAllianceAndContinent(
-//				attackers, 13, "Dirty Mastiff Cartel");
+		// Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>,
+		// ArrayList<ArrayList<Pair<String, City>>>>>
+		// waterTargetsByNameAndContinent =
+		// getWaterTargetsByAllianceAndContinent(
+		// attackers, 13, "Dirty Mastiff Cartel");
 		Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> waterTargetsByNameAndContinent = getWaterTargetsByNameAndContinent(
-				attackers, 13, "Fuzzle");
+				attackers, 43, "OldShang");
 		printSimpleTargets(waterTargetsByNameAndContinent);
 		//
 		// System.out.println("NEW ONE\n");

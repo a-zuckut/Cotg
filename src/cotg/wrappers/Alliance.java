@@ -27,9 +27,14 @@ public class Alliance implements Serializable {
 		return sum;
 	}
 	
+	public String detailedToString() {
+		generateScore();
+		return String.format("%-50s", "\"" + name + "\"" + " with score: " + generateScore()) + "Players: " + players;
+	}
+	
 	@Override
 	public String toString() {
 		generateScore();
-		return String.format("%-50s", "\"" + name + "\"" + " with score: " + generateScore()) + "Players: " + players; 
+		return String.format("%-50s", "\"" + name + "\"" + " with score: " + generateScore()); 
 	}
 }
