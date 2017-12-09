@@ -20,23 +20,20 @@ import javax.swing.event.DocumentListener;
 
 import cotg.wrappers.Player;
 import gui.helper.GhostText;
+import gui.helper.MyCloseKeyListener;
 import gui.helper.MyListKeyListener;
-import gui.helper.MyListSelectionListener;
 
 public class PlayersPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
 	public static final String ghostText = "Search...";
-	
-	protected static MyListSelectionListener<Player> listListener = new MyListSelectionListener<>();
-	
 	private Set<Player> players;
-	
 	private JTextField search;
 	private JScrollPane scrollPane;
 	private JList<Player> list;
 	private JButton submit;
+	public JFrame frame;
 	
 	public static JFrame childFrame = null;
 
@@ -54,7 +51,7 @@ public class PlayersPanel extends JPanel {
 
 	public void filterModel(DefaultListModel<Player> model, String filter) {
 		for (Player s : players) {
-			if (!s.name.startsWith(filter) && !filter.equals(ghostText)) {
+			if (!s.name.toLowerCase().trim().startsWith(filter.toLowerCase().trim()) && !filter.equals(ghostText)) {
 				if (model.contains(s)) {
 					model.removeElement(s);
 				}
@@ -85,7 +82,6 @@ public class PlayersPanel extends JPanel {
 		new GhostText(search, ghostText);
 
 		list = createJList();
-		list.addListSelectionListener(listListener);
 		list.setVisibleRowCount(6);
 
 		search.getDocument().addDocumentListener(new DocumentListener() {
@@ -116,14 +112,15 @@ public class PlayersPanel extends JPanel {
 		submit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				childFrame = new PlayerFrame(listListener.selected);
+				childFrame = new PlayerFrame(list.getSelectedValue());
 			}
 		});
 		
 		list.addKeyListener(new MyListKeyListener(submit));
 	}
 
-	public void addKeyListeners(KeyListener keyListener) {
+	public void addKeyListeners() {
+		KeyListener keyListener = new MyCloseKeyListener(frame, search, list);
 		search.addKeyListener(keyListener);
 		list.addKeyListener(keyListener);
 		scrollPane.addKeyListener(keyListener);

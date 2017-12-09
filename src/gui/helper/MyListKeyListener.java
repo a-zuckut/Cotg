@@ -7,7 +7,7 @@ import javax.swing.JButton;
 
 public class MyListKeyListener implements KeyListener {
 	
-	JButton button;
+	private JButton button;
 	
 	public MyListKeyListener(JButton input) {
 		this.button = input;

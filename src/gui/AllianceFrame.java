@@ -25,10 +25,9 @@ public class AllianceFrame extends JFrame {
 		this.setLocationRelativeTo(GUI.frame);
 		this.setLayout(new BorderLayout());
 		
-		keyListener = new MyCloseKeyListener(this);
-		
 		pPanel = new PlayersPanel(a.players, getWidth()/2, getHeight()/2);
-		pPanel.addKeyListeners(keyListener);
+		pPanel.frame = this;
+		pPanel.addKeyListeners();
 		
 		this.add(pPanel, BorderLayout.CENTER);
 		

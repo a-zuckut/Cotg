@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -19,8 +20,8 @@ import javax.swing.event.DocumentListener;
 import cotg.data.Constants;
 import cotg.wrappers.Alliance;
 import gui.helper.GhostText;
+import gui.helper.MyCloseKeyListener;
 import gui.helper.MyListKeyListener;
-import gui.helper.MyListSelectionListener;
 
 public class GUI extends JPanel {
 	
@@ -34,7 +35,6 @@ public class GUI extends JPanel {
 	protected JList<Alliance> list;
 	protected JButton open;
 
-	protected static MyListSelectionListener<Alliance> listListener = new MyListSelectionListener<>();
 	public static JFrame childFrame = null;
 	public static JFrame frame = GuiRunner.main;
 	
@@ -51,7 +51,7 @@ public class GUI extends JPanel {
 
 	public void filterModel(DefaultListModel<Alliance> model, String filter) {
 		for (Alliance s : Constants.curr_alliances) {
-			if (!s.name.startsWith(filter) && !filter.equals(ghostText)) {
+			if (!s.name.toLowerCase().trim().startsWith(filter.toLowerCase().trim()) && !filter.equals(ghostText)) {
 				if (model.contains(s)) {
 					model.removeElement(s);
 				}
@@ -82,7 +82,6 @@ public class GUI extends JPanel {
 		new GhostText(search, ghostText);
 
 		list = createJList();
-		list.addListSelectionListener(listListener);
 		list.setVisibleRowCount(6);
 		
 		search.getDocument().addDocumentListener(new DocumentListener() {
@@ -113,11 +112,21 @@ public class GUI extends JPanel {
 		open.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				childFrame = new AllianceFrame(listListener.selected);
+				childFrame = new AllianceFrame(list.getSelectedValue());
 			}
 		});
 		
 		list.addKeyListener(new MyListKeyListener(open));
+		addKeyListeners();
+	}
+	
+	public void addKeyListeners() {
+		KeyListener keyListener = new MyCloseKeyListener(frame, search, list);
+		list.addKeyListener(keyListener);
+		search.addKeyListener(keyListener);
+		open.addKeyListener(keyListener);
+		scroll.addKeyListener(keyListener);
+		this.addKeyListener(keyListener);
 	}
 
 }
