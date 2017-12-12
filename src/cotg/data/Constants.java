@@ -19,11 +19,14 @@ public class Constants {
 	static {
 		try {
 			curr_alliances = getAllianceFromFile(alliance_file);
-			sortByScore(curr_alliances);
 			if(curr_alliances == null) {
 				System.out.println("Parsing");
 				curr_alliances = Parser.parseIntoAlliances("src/cotg/data/playerData.csv", 0);
 				Parser.storeData(curr_alliances);
+			} else {
+				// Try to update! :)
+				sortByScore(curr_alliances);
+				Parser.update("src/cotg/data/playerData.csv");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -85,11 +88,39 @@ public class Constants {
 		return null;
 	}
 	
+	public static void main(String[] args) {
+		printCityCountOnContinent(30);
+	}
+	
 	public static void printWaterCastlesForPlayerOnContinent(String player, int continent) {
 		Player p = null;
 		if((p = findPlayer(player)) == null) return;
 		
 		for(City c:p.cities) if(c.continent == continent && c.isCastle && c.isWater) System.out.println(c);
+	}
+	
+	public static void printCityCountOnContinent(int continent) {
+		int count = 0;
+		for(Alliance a: curr_alliances) {
+			for(Player p: a.players) {
+				for(City c: p.cities) {
+					if(c.continent == continent) count++;
+				}
+			}
+		}
+		
+		System.out.println("Continent " + continent + " has " + count + " cities.");
+	}
+
+	public static int addAlliance(String s1) {
+		System.out.println("ADD ALLIANCE: " + s1);
+		Alliance[] alliances = new Alliance[curr_alliances.length + 1];
+		for(int i = 0; i < curr_alliances.length; i++) {
+			alliances[i] = curr_alliances[i];
+		}
+		alliances[curr_alliances.length] = new Alliance(s1);
+		System.out.println("Added Alliance " + s1);
+		return curr_alliances.length;
 	}
 	
 }

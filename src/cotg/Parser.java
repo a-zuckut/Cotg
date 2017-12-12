@@ -1,6 +1,5 @@
 package cotg;
 
-import java.awt.Container;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,7 +10,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +20,8 @@ import cotg.wrappers.City;
 import cotg.wrappers.Player;
 
 public class Parser {
+	
+	public static final String fileName = "src/cotg/data/playerData.csv";
 
 	/**
 	 * Simple file parser
@@ -61,9 +61,6 @@ public class Parser {
 			String alliance = split[2].trim();
 			String player = split[1].trim();
 
-			if (alliance.trim().equals("") || player.trim().equals(""))
-				continue;
-
 			City ne = new City(input);
 			if (ret.containsKey(alliance)) {
 				if (ret.get(alliance).containsKey(player)) {
@@ -88,7 +85,7 @@ public class Parser {
 		Map<String, Map<String, ArrayList<City>>> data = parseIntoMaps(s);
 
 		ArrayList<Alliance> TEMP = new ArrayList<Alliance>();
-
+		
 		for (String alliance : data.keySet()) {
 			Map<String, ArrayList<City>> players = data.get(alliance);
 
@@ -114,31 +111,34 @@ public class Parser {
 	}
 
 	public static void update(String s) {
+		System.out.println("Updating");
 		Map<String, Map<String, ArrayList<City>>> data = parseIntoMaps(s);
 
 		Alliance[] alliances = Constants.curr_alliances;
 
 		for (String s1 : data.keySet()) {
 			int index = -1;
-			if ((index = alliancesContains(s1)) != -1) {
-				for (String p : data.get(s1).keySet()) {
-					Player new_player = new Player(p, s1);
-					new_player.cities.addAll(data.get(s1).get(p));
-					new_player.generateScore();
-
-					removePlayer(alliances, new_player, index);
-
-					if (!alliances[index].players.add(new_player)) {
-						// updates by replacing...
-						alliances[index].players.remove(new_player);
-						alliances[index].players.add(new_player);
-					} else {
-						System.out.println("Added new player " + new_player.name);
-						alliances[index].players.add(new_player);
-					}
-				}
-				alliances[index].generateScore();
+			
+			if ((index = alliancesContains(s1)) == -1) {
+				index = Constants.addAlliance(s1);
 			}
+			
+			for (String p : data.get(s1).keySet()) {
+				Player new_player = new Player(p, s1);
+				new_player.cities.addAll(data.get(s1).get(p));
+				new_player.generateScore();
+
+				removePlayer(alliances, new_player, index);
+
+				if (!alliances[index].players.add(new_player)) {
+					// updates by replacing...
+					alliances[index].players.remove(new_player);
+					alliances[index].players.add(new_player);
+				} else {
+					alliances[index].players.add(new_player);
+				}
+			}
+			alliances[index].generateScore();
 		}
 
 		Constants.curr_alliances = removeEmptyAlliances(alliances);
@@ -175,7 +175,6 @@ public class Parser {
 			List<Player> remove = new LinkedList<>();
 			for (Player player : a.players) {
 				if (player.equals(new_player)) {
-					System.out.println("Removed player " + player + " in " + a.name);
 					remove.add(player);
 				}
 			}
@@ -229,10 +228,16 @@ public class Parser {
 		fos.close();
 		System.out.println("Map<String, String> stored");
 	}
+	
+	public static void printAlliances(Alliance[] a) {
+		System.out.println("Printing alliances");
+		for(Alliance alliance : a) {
+			System.out.println("\"" + alliance.name + "\"");
+		}
+	}
 
 	public static void main(String[] args) {
-		update("src/cotg/data/playerData.csv");
-		Constants.printWaterCastlesForPlayerOnContinent("OldShang", 43);
+		Constants.printAlliances();
 	}
 
 	public static ArrayList<String> parseFiles(String file) {
