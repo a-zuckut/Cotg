@@ -60,7 +60,7 @@ public class City implements Serializable {
 	
 	@Override
 	public String toString() {
-		return String.format("%s at (%d, %d) with score %d...", city_name != null ? city_name : "City", x_coord, y_coord, score) + " is a " + (isWater ? "water " : "land ") + (!isTemple ? (isCastle ? "castle " : "city ") : "temple ");
+		return String.format("%s at %d(%d, %d) with score %d", city_name != null ? city_name : "City", continent, x_coord, y_coord, score) + " is a " + (isWater ? "water " : "land ") + (!isTemple ? (isCastle ? "castle " : "city ") : "temple ");
 	}
 	
 	@Override
@@ -79,5 +79,9 @@ public class City implements Serializable {
 
 	public String simpleString() {
 		return city_name + " " + String.format("(%d, %d)", x_coord, y_coord);
+	}
+	
+	public String coords() {
+		return String.format("(%d, %d)", x_coord, y_coord);
 	}
 }

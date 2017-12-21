@@ -12,6 +12,7 @@ public class GuiRunner {
 	
 	public static JFrame main;
 	public static GUI gui;
+	public static Functions functions;
 	
 	public static void initGUI() {
 		main = new JFrame("Testing Data Screen");
@@ -19,8 +20,10 @@ public class GuiRunner {
 		main.setLayout(new FlowLayout());
 		
 		gui = new GUI();
+		functions = new Functions();
 		
 		main.add(gui);
+		main.add(functions);
 		
 		main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		main.setVisible(true);

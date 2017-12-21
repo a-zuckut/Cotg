@@ -40,7 +40,7 @@ public class Parser {
 			}
 			br.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			return null;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -51,6 +51,8 @@ public class Parser {
 	public static Map<String, Map<String, ArrayList<City>>> parseIntoMaps(String string) {
 
 		ArrayList<String> in = parseFiles(string);
+		
+		if(in == null) return null;
 		Map<String, Map<String, ArrayList<City>>> ret = new HashMap<>();
 
 		for (String input : in) {
@@ -83,6 +85,7 @@ public class Parser {
 
 	public static Alliance[] parseIntoAlliances(String s, int score_min) {
 		Map<String, Map<String, ArrayList<City>>> data = parseIntoMaps(s);
+		if(data == null) return null;
 
 		ArrayList<Alliance> TEMP = new ArrayList<Alliance>();
 		
@@ -114,7 +117,7 @@ public class Parser {
 		System.out.println("Updating");
 		Map<String, Map<String, ArrayList<City>>> data = parseIntoMaps(s);
 
-		Alliance[] alliances = Constants.curr_alliances;
+		if(data == null) return;
 
 		for (String s1 : data.keySet()) {
 			int index = -1;
@@ -128,24 +131,23 @@ public class Parser {
 				new_player.cities.addAll(data.get(s1).get(p));
 				new_player.generateScore();
 
-				removePlayer(alliances, new_player, index);
+				removePlayer(new_player, index);
 
-				if (!alliances[index].players.add(new_player)) {
+				if (!Constants.curr_alliances[index].players.add(new_player)) {
 					// updates by replacing...
-					alliances[index].players.remove(new_player);
-					alliances[index].players.add(new_player);
+					Constants.curr_alliances[index].players.remove(new_player);
+					Constants.curr_alliances[index].players.add(new_player);
 				} else {
-					alliances[index].players.add(new_player);
+					Constants.curr_alliances[index].players.add(new_player);
 				}
 			}
-			alliances[index].generateScore();
+			Constants.curr_alliances[index].generateScore();
 		}
 
-		Constants.curr_alliances = removeEmptyAlliances(alliances);
 		storeData(Constants.curr_alliances);
 	}
 
-	private static Alliance[] removeEmptyAlliances(Alliance[] alliances) {
+	public static Alliance[] removeEmptyAlliances(Alliance[] alliances) {
 		int num = 0;
 		for (int i = 0; i < alliances.length; i++) {
 			if (alliances[i].players.isEmpty())
@@ -168,9 +170,9 @@ public class Parser {
 		return ret;
 	}
 
-	private static void removePlayer(Alliance[] alliances, Player new_player, int index) {
-		for (Alliance a : alliances) {
-			if (a.equals(alliances[index]))
+	private static void removePlayer(Player new_player, int index) {
+		for (Alliance a : Constants.curr_alliances) {
+			if (a.equals(Constants.curr_alliances[index]))
 				continue;
 			List<Player> remove = new LinkedList<>();
 			for (Player player : a.players) {
