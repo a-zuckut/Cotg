@@ -42,7 +42,8 @@ public class AttackCreator {
 	}
 
 	public static Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> getWaterTargetsByAllianceAndContinent(
-			Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers, int continent, String alliance) {
+			Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers, int continent, int x, int y, int rad,
+			String alliance) {
 		ArrayList<String> playerList = new ArrayList<>();
 
 		Alliance a = Constants.findAlliance(alliance);
@@ -56,11 +57,11 @@ public class AttackCreator {
 
 		String[] targets = new String[playerList.size()];
 		playerList.toArray(targets);
-		return getWaterTargetsByNameAndContinent(attackers, continent, targets);
+		return getWaterTargetsByNameAndContinent(attackers, continent, x, y, rad, targets);
 	}
-	
+
 	public static Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> getWaterTargetsByAllianceAndContinentV2(
-			Map<String, AttackTypes> attackers, int continent, String alliance) {
+			Map<String, AttackTypes> attackers, int continent, int x, int y, int rad, String alliance) {
 		ArrayList<String> playerList = new ArrayList<>();
 
 		Alliance a = Constants.findAlliance(alliance);
@@ -74,7 +75,7 @@ public class AttackCreator {
 
 		String[] targets = new String[playerList.size()];
 		playerList.toArray(targets);
-		return getWaterTargetsByNameAndContinentV2(attackers, continent, targets);
+		return getWaterTargetsByNameAndContinentV2(attackers, continent, x, y, rad, targets);
 	}
 
 	public static void printArray(String[] players) {
@@ -84,13 +85,14 @@ public class AttackCreator {
 	}
 
 	public static Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> getWaterTargetsByNameAndContinent(
-			Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers, int continent, String... targetPlayers) {
-		Pair<ArrayList<City>, ArrayList<City>> p = getRealsAndFakes(attackers, continent, targetPlayers);
+			Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers, int continent, int x, int y, int rad,
+			String... targetPlayers) {
+		Pair<ArrayList<City>, ArrayList<City>> p = getRealsAndFakes(attackers, continent, x, y, rad, targetPlayers);
 		return getTargets(attackers, p.p1, p.p2);
 	}
 
 	public static Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> getWaterTargetsByNameAndContinentV2(
-			Map<String, AttackTypes> attackers, int continent, String... targetPlayers) {
+			Map<String, AttackTypes> attackers, int continent, int x, int y, int rad, String... targetPlayers) {
 		Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers2 = new HashMap<>();
 		for (String player : attackers.keySet()) {
 			AttackTypes a = attackers.get(player);
@@ -99,7 +101,7 @@ public class AttackCreator {
 		}
 
 		Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> xMap = getWaterTargetsByNameAndContinent(
-				attackers2, continent, targetPlayers);
+				attackers2, continent, x, y, rad, targetPlayers);
 		distributeAssaults(xMap, attackers, attackers2);
 		return xMap;
 	}
@@ -271,7 +273,8 @@ public class AttackCreator {
 	}
 
 	public static Pair<ArrayList<City>, ArrayList<City>> getRealsAndFakes(
-			Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers, int continent, String... targetPlayers) {
+			Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers, int continent, int x_, int y_, int rad_,
+			String... targetPlayers) {
 		int reals_max = 0;
 		int fakes_max = 0;
 		for (String pid : attackers.keySet()) {
@@ -283,7 +286,7 @@ public class AttackCreator {
 		// Note that reals 0-pid1.p1 = reals for pid1 etc (same for fakes) (pid
 		// = player
 		// id 1) - first attacker
-		ArrayList<City> targets = getTargets(continent, targetPlayers);
+		ArrayList<City> targets = getTargets(continent, x_, y_, rad_, targetPlayers);
 
 		// Acquired data
 		int reals = 0;
@@ -386,6 +389,10 @@ public class AttackCreator {
 	}
 
 	private static ArrayList<City> getTargets(int continent, String... targetPlayers) {
+		return getTargets(continent, -1, -1, -1, targetPlayers);
+	}
+
+	private static ArrayList<City> getTargets(int continent, int x, int y, int radius, String... targetPlayers) {
 		ArrayList<City> targets = new ArrayList<>();
 		for (String player : targetPlayers) {
 			for (Alliance a : Constants.curr_alliances) {
@@ -395,7 +402,9 @@ public class AttackCreator {
 							for (City c : p.cities) {
 								if (c.isCastle && c.isWater && (c.continent == -1 || c.continent == continent)
 										&& c.score >= 6000) {
-									targets.add(c);
+									if ((x != -1 && y != -1)
+											|| Math.abs(c.x_coord - x) > radius && Math.abs(c.y_coord - y) > radius)
+										targets.add(c);
 								}
 							}
 						}
@@ -706,12 +715,16 @@ public class AttackCreator {
 
 		Scanner scanner = new Scanner(System.in);
 		Map<String, AttackTypes> attackersV2 = new HashMap<>();
-		attackersV2.put("azuckut", new AttackTypes(1, 19, 0, 0, 0, 0, 0, 0, 0, 6, 10));
+		attackersV2.put("Azuckut", new AttackTypes(1, 19, 0, 0, 0, 0, 0, 0, 0, 6, 10));
 		attackersV2.put("Idiocracy", new AttackTypes(0, 6, 0, 3, 0, 1, 0, 0, 0, 6, 0));
 		attackersV2.put("GoldWing", new AttackTypes(9, 0, 5, 0, 0, 0, 0, 0, 0, 6, 0));
 
-		Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> waterTargetsByNameAndContinent = getWaterTargetsByNameAndContinentV2(
-				attackersV2, 14, "teemingjoker");
+		// Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>,
+		// ArrayList<ArrayList<Pair<String, City>>>>>
+		// waterTargetsByNameAndContinent = getWaterTargetsByNameAndContinentV2(
+		// attackersV2, 14, -1,-1,-1, "teemingjoker");
+		Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> waterTargetsByNameAndContinent = getWaterTargetsByAllianceAndContinentV2(
+				attackersV2, 13, 390, 134, 30, "Dirty Mastiff Cartel");
 		printAttacksByTargets(waterTargetsByNameAndContinent);
 		System.out.println(printSimpleTargets(waterTargetsByNameAndContinent));
 
