@@ -1,6 +1,5 @@
 package cotg.data;
 
-import java.awt.print.Printable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
