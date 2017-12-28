@@ -34,7 +34,7 @@ public class Functions extends JPanel {
 	private ButtonActionListener buttonActionListener;
 
 	public Functions() {
-		this.setPreferredSize(new Dimension(900, 300));
+		this.setPreferredSize(new Dimension(900, 400));
 		initComponents();
 		setUpLayout();
 	}
@@ -45,39 +45,39 @@ public class Functions extends JPanel {
 		buttonActionListener = new ButtonActionListener(continent, player);
 
 		// Requires continent
-		printCityCountOnContinent = new JButton("City Count Continent");
+		printCityCountOnContinent = new JButton("City Count (continent)");
 		printCityCountOnContinent.addActionListener(buttonActionListener.set(1));
 
 		// Requires continent
-		printScoreOfPlayersOnContinent = new JButton("Scores Continent");
+		printScoreOfPlayersOnContinent = new JButton("Scores (continent)");
 		printScoreOfPlayersOnContinent.addActionListener(buttonActionListener.set(2));
 
 		// Requires player and continent
-		printWaterCastlesForPlayerOnContinent = new JButton("Player Water Castles On Cont");
+		printWaterCastlesForPlayerOnContinent = new JButton("Player Water Castles On Cont (player, continent)");
 		printWaterCastlesForPlayerOnContinent.addActionListener(buttonActionListener.set(3));
 		
 		// Requires player
-		printWaterCastlesForPlayer = new JButton("Player Water Castles");
+		printWaterCastlesForPlayer = new JButton("Player Water Castles (player)");
 		printWaterCastlesForPlayer.addActionListener(buttonActionListener.set(9));
 
 		// Requires string (alliance)
-		printAlliance = new JButton("Print Specific Alliance");
+		printAlliance = new JButton("Print Specific Alliance (alliance)");
 		printAlliance.addActionListener(buttonActionListener.set(4));
 
 		// Requires N/A
-		printAlliances = new JButton("Print Alliances");
+		printAlliances = new JButton("Print Alliances ()");
 		printAlliances.addActionListener(buttonActionListener.set(5));
 
 		// Requires N/A
-		printAndLoadFaiths = new JButton("Print Faiths");
+		printAndLoadFaiths = new JButton("Print Faiths ()");
 		printAndLoadFaiths.addActionListener(buttonActionListener.set(6));
 
 		// Requires N/A
-		printAndLoadControlledContinents = new JButton("Controlled Continents");
+		printAndLoadControlledContinents = new JButton("Controlled Continents ()");
 		printAndLoadControlledContinents.addActionListener(buttonActionListener.set(7));
 
 		// Requires N/A
-		printAllianceControllingContinents = new JButton("Alliance Contients");
+		printAllianceControllingContinents = new JButton("Alliance Contients ()");
 		printAllianceControllingContinents.addActionListener(buttonActionListener.set(8));
 	}
 
@@ -90,14 +90,14 @@ public class Functions extends JPanel {
 		c.anchor = GridBagConstraints.CENTER;
 		this.add(new JLabel("Continent"), c);
 		
-		c.gridx = 1;
+		c.gridx = 2;
 		this.add(continent, c);
 		
 		c.gridx = 0;
 		c.gridy = 1;
 		this.add(new JLabel("String (alliance/player)"), c);
 
-		c.gridx = 1;
+		c.gridx = 2;
 		this.add(player, c);
 		
 		c.gridx = 0;
@@ -120,13 +120,14 @@ public class Functions extends JPanel {
 		c.gridx = 1;
 		this.add(printAlliances, c);
 		
-		c.gridx = 2;
+		c.gridy = 4;
+		c.gridx = 0;
 		this.add(printAndLoadControlledContinents, c);
 		
-		c.gridx = 3;
+		c.gridx = 1;
 		this.add(printAndLoadFaiths, c);
 		
-		c.gridx = 4;
+		c.gridx = 2;
 		this.add(printAllianceControllingContinents, c);
 	}
 

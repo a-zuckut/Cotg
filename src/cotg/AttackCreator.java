@@ -2,6 +2,7 @@ package cotg;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,15 +21,15 @@ import cotg.wrappers.helper.Pair;
 public class AttackCreator {
 	// Static methods because will be utilized from main method
 
-	public static final int attacks_per_castle = 6;
+	public static final int attacks_per_castle = 7;
 
-	public static final boolean try_senator_siege = true;
+	public static final boolean try_senator_siege = false;
 	// only used if(try_senator_siege)
-	public static final int assault_siege_per_castle = 2;
+	public static final int assault_siege_per_castle = 1;
 
 	// minimum_attacks_per_real_target + 1 <= minimum_attacks_per_target
-	public static final int minimum_attacks_per_real_target = 7;
-	public static final int minimum_attacks_per_target = 8;
+	public static final int minimum_attacks_per_real_target = 12;
+	public static final int minimum_attacks_per_target = minimum_attacks_per_real_target + 1;
 
 	private static final Random GENERATOR = new Random();
 	public static Random random;
@@ -91,6 +92,23 @@ public class AttackCreator {
 		return getTargets(attackers, p.p1, p.p2);
 	}
 
+	/**
+	 * 
+	 * @param attackers
+	 *            The attackers each containing all attack types
+	 * @param continent
+	 *            Which continent to attack.
+	 * @param x
+	 *            If want to attack based on area.
+	 * @param y
+	 *            If want to attack based on area.
+	 * @param rad
+	 *            Radius if want to attack based on area
+	 * @param targetPlayers
+	 *            Players to attack.
+	 * @return Returns a Map containing Players to list of attacks - First pair
+	 *         is Reals, Second pair is pure fakes
+	 */
 	public static Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> getWaterTargetsByNameAndContinentV2(
 			Map<String, AttackTypes> attackers, int continent, int x, int y, int rad, String... targetPlayers) {
 		Map<String, Pair<Pair<Integer, Integer>, Integer>> attackers2 = new HashMap<>();
@@ -336,7 +354,7 @@ public class AttackCreator {
 		}
 
 		ArrayList<Pair<City, ArrayList<String>>> attacks = generateAttack(r2, f2, reals, fakes);
-		// printArray(attacks);
+		printArray(attacks);
 		return ChangeDataStructure(attackers, r2, f2, attacks);
 	}
 
@@ -365,6 +383,14 @@ public class AttackCreator {
 								p1.p1));
 					}
 				}
+
+				re.sort(new Comparator<Pair<String, City>>() {
+					@Override
+					public int compare(Pair<String, City> o1, Pair<String, City> o2) {
+						return o2.p1.compareTo(o1.p1);
+					}
+				});
+
 				res.add(re);
 			}
 			curr_real_index += p.p1.p1 + p.p1.p2;
@@ -711,24 +737,22 @@ public class AttackCreator {
 
 	public static void main(String[] args) {
 
-		useSeed(-3986336101128586454l);
+		// useSeed(-5509912525257982219L);
 
 		Scanner scanner = new Scanner(System.in);
-		Map<String, AttackTypes> attackersV2 = new HashMap<>();
-		attackersV2.put("Azuckut", new AttackTypes(1, 19, 0, 0, 0, 0, 0, 0, 0, 6, 10));
-		attackersV2.put("Idiocracy", new AttackTypes(0, 6, 0, 3, 0, 1, 0, 0, 0, 6, 0));
-		attackersV2.put("GoldWing", new AttackTypes(9, 0, 5, 0, 0, 0, 0, 0, 0, 6, 0));
 
-		// Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>,
-		// ArrayList<ArrayList<Pair<String, City>>>>>
-		// waterTargetsByNameAndContinent = getWaterTargetsByNameAndContinentV2(
-		// attackersV2, 14, -1,-1,-1, "teemingjoker");
+		// All the attackers inputs. Can do this with csv sheet. Need to test.
+		Map<String, AttackTypes> attackersV2 = new HashMap<>();
+		// attackersV2 = csvToAttackers("src/cotg/data/DATA.csv");
+
+		int x = -1, y = -1, radius = -1;
 		Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>, ArrayList<ArrayList<Pair<String, City>>>>> waterTargetsByNameAndContinent = getWaterTargetsByAllianceAndContinentV2(
-				attackersV2, 13, 390, 134, 30, "Dirty Mastiff Cartel");
+				attackersV2, 22, x, y, radius, Constants.DMC);
 		printAttacksByTargets(waterTargetsByNameAndContinent);
+
 		System.out.println(printSimpleTargets(waterTargetsByNameAndContinent));
 
-		System.out.println(AttackCreator.seed);
+		// System.out.println(AttackCreator.seed);
 
 		// String input = "", rString = "";
 		// while (!(rString = scanner.nextLine()).equals("q")) {
@@ -791,7 +815,7 @@ public class AttackCreator {
 					currentIndex = endIndex;
 				}
 
-				String json = attackType + " {\"type\": " + Arrays.toString(type) + ", \"y\": " + Arrays.toString(y)
+				String json = attackType + "\t{\"type\": " + Arrays.toString(type) + ", \"y\": " + Arrays.toString(y)
 						+ ", \"x\": " + Arrays.toString(x) + ", \"time\": [\"10\", \"00\", \"00\", \"" + month + "/"
 						+ day + "/2017\"]}";
 				System.out.println(json);
@@ -828,19 +852,19 @@ public class AttackCreator {
 		if (string.contains(ATTACK_TYPES.DRUID_SEN_SIEGE.name()))
 			return ATTACK_TYPES.DRUID_SEN_SIEGE.name();
 
-		if (string.contains(ATTACK_TYPES.FAKE.name()))
-			return ATTACK_TYPES.FAKE.name();
+		if (string.contains(ATTACK_TYPES.WS_SEN_SIEGE.name()))
+			return ATTACK_TYPES.WS_SEN_SIEGE.name();
+		if (string.contains(ATTACK_TYPES.WS_SIEGE.name()))
+			return ATTACK_TYPES.WS_SIEGE.name();
+
 		if (string.contains(ATTACK_TYPES.FAKE_ASSAULT.name()))
 			return ATTACK_TYPES.FAKE_ASSAULT.name();
 		if (string.contains(ATTACK_TYPES.FAKE_SCOUT.name()))
 			return ATTACK_TYPES.FAKE_SCOUT.name();
 		if (string.contains(ATTACK_TYPES.FAKE_SIEGE.name()))
 			return ATTACK_TYPES.FAKE_SIEGE.name();
-
-		if (string.contains(ATTACK_TYPES.WS_SEN_SIEGE.name()))
-			return ATTACK_TYPES.WS_SEN_SIEGE.name();
-		if (string.contains(ATTACK_TYPES.WS_SIEGE.name()))
-			return ATTACK_TYPES.WS_SIEGE.name();
+		if (string.contains(ATTACK_TYPES.FAKE.name()))
+			return ATTACK_TYPES.FAKE.name();
 
 		return "";
 	}
@@ -854,4 +878,41 @@ public class AttackCreator {
 		return i;
 	}
 
+	/*
+	 * 0 Timestamp 1 In-Game Name 2 Vanquisher/Galley Castles [Senator Capable]
+	 * 3 Vanquisher/Galley Castles [Not Senator Capable] 4 Horseman/Galley
+	 * Castles [Senator Capable] 5 Horseman/Galley Castles [Not Senator Capable]
+	 * 6 Sorcerer/Galley Castles [Senator Capable] 7 Sorcerer/Galley Castles
+	 * [Not Senator Capable] 8 Druid/Galley Castles [Senator Capable] 9
+	 * Druid/Galley Castles [Not Senator Capable] 10 Warship Castles [Senator
+	 * Capable] 11 Warship Castles [Not Senator Capable] 12 Sorcerer/Galley
+	 * Castles [Not Senator Capable]
+	 */
+	public static Map<String, AttackTypes> csvToAttackers(String file) {
+		ArrayList<String> rows = Parser.parseFiles(file);
+		Map<String, AttackTypes> ret = new HashMap<String, AttackTypes>();
+
+		for (int i = 1; i < rows.size(); i++) {
+			String[] column = rows.get(i).split(",");
+			String name = column[1];
+
+			int vanq_sen = Integer.valueOf(column[2]);
+			int vanq = Integer.valueOf(column[3]);
+			int sorc_sen = Integer.valueOf(column[6]);
+			int sorc = Integer.valueOf(column[7]);
+			int horse_sen = Integer.valueOf(column[4]);
+			int horse = Integer.valueOf(column[5]);
+			int druid_sen = Integer.valueOf(column[8]);
+			int druid = Integer.valueOf(column[9]);
+			int ws_sen = 0;
+			int ws = Integer.valueOf(column[10]) + Integer.valueOf(column[11]);
+			int fakes = Integer.valueOf(column[12]);
+
+			AttackTypes curr = new AttackTypes(vanq_sen, vanq, sorc_sen, sorc, horse_sen, horse, druid_sen, druid,
+					ws_sen, ws, fakes);
+			ret.put(name, curr);
+		}
+
+		return ret;
+	}
 }

@@ -21,6 +21,8 @@ import cotg.wrappers.Player;
 
 public class Parser {
 	
+	public static final boolean debug = false;
+	
 	public static final String fileName = "src/cotg/data/playerData.csv";
 
 	/**
@@ -137,8 +139,12 @@ public class Parser {
 					// updates by replacing...
 					Constants.curr_alliances[index].players.remove(new_player);
 					Constants.curr_alliances[index].players.add(new_player);
+					
+					if(debug) System.out.println("Updated: " + new_player.name);
 				} else {
 					Constants.curr_alliances[index].players.add(new_player);
+					
+					if(debug) System.out.println("Added player: " + new_player.name);
 				}
 			}
 			Constants.curr_alliances[index].generateScore();

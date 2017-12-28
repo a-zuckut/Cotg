@@ -124,5 +124,10 @@ public class AttackTypes {
 		}
 		return false;
 	}
+	
+	@Override
+	public String toString() {
+		return "Vanq With Sen: " + vanq_with_sen + ", Vanq: " + vanq + ", Sorc With Sen: " + sorc_with_sen + ", Sorc: " + sorc + ", Horse with Sen: " + horse_with_sen + ", Horse: " + horse + ", Druid With Sen: " + druid_with_sen + ", Druid: " + druid + ", WS with Sen: " + ws_with_sen + ", WS: " + ws + "\n";
+	}
 
 }
