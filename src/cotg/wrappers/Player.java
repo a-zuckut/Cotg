@@ -26,7 +26,10 @@ public class Player implements Serializable {
 	
 	public int generateScore() {
 		int sum = 0; if(cities==null) return 0;
-		for(City c : cities) sum+=c.score;
+		for(City c : cities) {
+			sum+=c.score;
+			c.player = name;
+		}
 		score = sum;
 		return sum;
 	}

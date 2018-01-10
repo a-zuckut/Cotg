@@ -34,7 +34,7 @@ public class Functions extends JPanel {
 	private ButtonActionListener buttonActionListener;
 
 	public Functions() {
-		this.setPreferredSize(new Dimension(900, 400));
+		this.setPreferredSize(new Dimension(1000, 400));
 		initComponents();
 		setUpLayout();
 	}

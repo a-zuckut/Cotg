@@ -28,7 +28,7 @@ public class GUI extends JPanel {
 	public static final String ghostText = "Search...";
 
 	protected static final long serialVersionUID = 1L;
-	public static final int pref_width = 600, pref_height = 400;
+	public static final int pref_width = 600, pref_height = 300;
 
 	protected JTextField search;
 	protected JScrollPane scroll;

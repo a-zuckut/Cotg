@@ -4,7 +4,10 @@ import java.io.Serializable;
 
 public class City implements Serializable {
 	private static final long serialVersionUID = 1L;
-
+	
+	public static final int COORDS_VERSION_SIMPLE = 0;
+	public static final int COORDS_VERSION_PARANTHESIS = 1;
+	
 	public int continent;
 	
 	public int score;
@@ -15,7 +18,7 @@ public class City implements Serializable {
 	public int x_coord;
 	public int y_coord;
 	
-	private String player;
+	public String player;
 	private String alliance;
 	private String city_name;
 	
@@ -60,7 +63,7 @@ public class City implements Serializable {
 	
 	@Override
 	public String toString() {
-		return String.format("%s at %d(%d, %d) with score %d", city_name != null ? city_name : "City", continent, x_coord, y_coord, score) + " is a " + (isWater ? "water " : "land ") + (!isTemple ? (isCastle ? "castle " : "city ") : "temple ");
+		return String.format("%s:%s at %d(%d, %d) with score %d", player, city_name != null ? city_name : "City", continent, x_coord, y_coord, score) + " is a " + (isWater ? "water " : "land ") + (!isTemple ? (isCastle ? "castle " : "city ") : "temple ");
 	}
 	
 	@Override
@@ -78,10 +81,20 @@ public class City implements Serializable {
 	}
 
 	public String simpleString() {
-		return city_name + " " + String.format("(%d, %d)", x_coord, y_coord);
+		return player + ":" + city_name + " " + String.format("(%d, %d)", x_coord, y_coord);
 	}
 	
 	public String coords() {
-		return String.format("(%d, %d)", x_coord, y_coord);
+		return coords(COORDS_VERSION_PARANTHESIS);
+	}
+	
+	public String coords(int version) {
+		switch (version) {
+		case COORDS_VERSION_SIMPLE:
+			return String.format("%d:%d", x_coord, y_coord);
+		case COORDS_VERSION_PARANTHESIS:
+		default:
+			return String.format("(%d, %d)", x_coord, y_coord);
+		}
 	}
 }

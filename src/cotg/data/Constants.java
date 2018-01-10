@@ -36,6 +36,7 @@ public class Constants {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		sortByScore(curr_alliances);
 	}
 
 	private static Alliance[] getAllianceFromFile(File file) throws Exception {
@@ -62,6 +63,7 @@ public class Constants {
 
 	public static void printAlliances() {
 		System.out.println("Printing alliances");
+		System.out.println("------------------");
 		for (Alliance alliance : curr_alliances) {
 			System.out.println(alliance.name);
 		}
@@ -94,15 +96,18 @@ public class Constants {
 		}
 		return null;
 	}
-	
+
 	public static final String WPH = "Wolf Pack & Horizon";
 	public static final String DMC = "Dirty Mastiff Cartel";
 	public static final String BSR = "Black Sail Reapers";
 
 	public static void main(String[] args) {
+		// printCastlesInContinentForAlliance(WPH, 03);
 //		printLandCastlesForAllianceContinent(DMC, 03);
 		printWaterCastlesForAllianceContinent(DMC, 03);
-//		printWaterCastlesForAllianceContinent(BSR, 54);
+		printWaterCastlesForAllianceContinent(BSR, 54);
+
+		printWaterCastlesForAllianceContinent(BSR, 43);
 	}
 
 	public static void printWaterCastlesForPlayerOnContinent(String player, int continent) {
@@ -174,7 +179,7 @@ public class Constants {
 
 		System.out.println(count);
 	}
-	
+
 	public static void printWaterCastlesForAllianceContinent(String alliance, int continent) {
 		Alliance alliance2 = findAlliance(alliance);
 
@@ -185,14 +190,14 @@ public class Constants {
 		for (Player p : alliance2.players) {
 			for (City c : p.cities) {
 				if (c.continent == continent && c.isCastle && c.isWater) {
-					System.out.println(p.name + "\t" + c.coords());
+//					System.out.println(p.name + "\t" + c.coords());
 					count++;
 				}
 			}
 		}
 		System.out.println(count);
 	}
-	
+
 	public static void printLandCastlesForAllianceContinent(String alliance, int continent) {
 		Alliance alliance2 = findAlliance(alliance);
 
@@ -226,7 +231,6 @@ public class Constants {
 	}
 
 	public static int addAlliance(String s1) {
-		System.out.println("ADD ALLIANCE: " + s1);
 		Alliance[] alliances = new Alliance[curr_alliances.length + 1];
 		for (int i = 0; i < curr_alliances.length; i++) {
 			alliances[i] = curr_alliances[i];

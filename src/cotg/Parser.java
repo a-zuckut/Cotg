@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -235,6 +236,14 @@ public class Parser {
 		oos.close();
 		fos.close();
 		System.out.println("Map<String, String> stored");
+	}
+	
+	public static void printToFile(String all, File file) throws Exception {
+		file.createNewFile();
+		PrintWriter printWriter = new PrintWriter(file);
+		printWriter.write(all);
+		printWriter.close();
+		System.out.println("File made");
 	}
 	
 	public static void printAlliances(Alliance[] a) {

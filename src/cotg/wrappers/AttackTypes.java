@@ -28,6 +28,10 @@ public class AttackTypes {
 		this.ws = ws;
 		this.fakes = fakes;
 	}
+	
+	public int getTotal() {
+		return vanq_with_sen + vanq + sorc + horse + druid + sorc_with_sen + horse_with_sen + druid_with_sen + ws_with_sen + ws + fakes;
+	}
 
 	public int getAssault() {
 		return vanq_with_sen + vanq + sorc + horse + druid + sorc_with_sen + horse_with_sen + druid_with_sen;
@@ -127,7 +131,7 @@ public class AttackTypes {
 	
 	@Override
 	public String toString() {
-		return "Vanq With Sen: " + vanq_with_sen + ", Vanq: " + vanq + ", Sorc With Sen: " + sorc_with_sen + ", Sorc: " + sorc + ", Horse with Sen: " + horse_with_sen + ", Horse: " + horse + ", Druid With Sen: " + druid_with_sen + ", Druid: " + druid + ", WS with Sen: " + ws_with_sen + ", WS: " + ws + "\n";
+		return "Vanq With Sen: " + vanq_with_sen + ", Vanq: " + vanq + ", Sorc With Sen: " + sorc_with_sen + ", Sorc: " + sorc + ", Horse with Sen: " + horse_with_sen + ", Horse: " + horse + ", Druid With Sen: " + druid_with_sen + ", Druid: " + druid + ", WS with Sen: " + ws_with_sen + ", WS: " + ws + ", FAKE: " + fakes + "\n";
 	}
 
 }
