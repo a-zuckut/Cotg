@@ -46,7 +46,7 @@ public class AttackTypes {
 	}
 
 	public boolean hasSenator() {
-		return vanq_with_sen + sorc_with_sen + horse_with_sen + druid_with_sen > 0;
+		return vanq_with_sen + sorc_with_sen + horse_with_sen + druid_with_sen + ws_with_sen > 0;
 	}
 
 	public boolean useSorc() {

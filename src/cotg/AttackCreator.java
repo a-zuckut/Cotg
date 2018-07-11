@@ -27,21 +27,21 @@ import cotg.wrappers.helper.Pair;
 public class AttackCreator {
 	// Static methods because will be utilized from main method
 
-	public static final int attacks_per_castle = 5;
+	public static final int attacks_per_castle = 6;
 
 	public static final boolean try_senator_siege = true;
 	// only used if(try_senator_siege)
 	public static final int assault_siege_per_castle = 2;
 
 	// minimum_attacks_per_real_target + 1 <= minimum_attacks_per_target
-	public static final int minimum_attacks_per_real_target = 18;
+	public static final int minimum_attacks_per_real_target = 10;
 	public static final int minimum_attacks_per_target = minimum_attacks_per_real_target + 1;
 
 	private static final Random GENERATOR = new Random();
 	public static Random random;
 	public static long seed;
 
-	public static String EXCLUDED_TARGETS = "";
+	public static String EXCLUDED_TARGETS = "451:554";
 
 	public static ATTACK_TYPES defaultScout = ATTACK_TYPES.FAKE_SIEGE;
 
@@ -324,7 +324,8 @@ public class AttackCreator {
 
 		// // Kinda a brute force thing to make sure to only have 888 has reals
 		ArrayList<Integer> realTargets = new ArrayList<Integer>();
-		realTargets = findRealsNotOnPlayer(targets, targetPlayers, Constants.findPlayer("null"));
+		realTargets = findRealsNotOnPlayer(targets, targetPlayers, "whitehot");
+		System.out.println(realTargets);
 
 		reals = reals_max / minimum_attacks_per_real_target;
 
@@ -350,15 +351,14 @@ public class AttackCreator {
 	}
 
 	private static ArrayList<Integer> findRealsNotOnPlayer(ArrayList<City> targets, String[] targetPlayers,
-			Player findPlayer) {
+			String findPlayer) {
 		ArrayList<Integer> ret = new ArrayList<>();
 
 		for (String temp : targetPlayers) {
-			Player p = Constants.findPlayer(temp);
-			if (findPlayer != null && p.equals(findPlayer))
+			if (!temp.equals(findPlayer) || findPlayer.equals(""))
 				continue;
 			else {
-				for (City c : p.cities) {
+				for (City c : Constants.findPlayer(temp).cities) {
 					if (targets.contains(c)) {
 						ret.add(targets.indexOf(c));
 					}
@@ -391,7 +391,7 @@ public class AttackCreator {
 		}
 
 		ArrayList<Pair<City, ArrayList<String>>> attacks = generateAttack(r2, f2, reals, fakes);
-		printArray(attacks);
+		// printArray(attacks);
 		return ChangeDataStructure(attackers, r2, f2, attacks);
 	}
 
@@ -457,6 +457,11 @@ public class AttackCreator {
 	}
 
 	private static ArrayList<City> getTargets(int continent, int x, int y, int radius, String... targetPlayers) {
+		return getTargets(continent, x, y, radius, 4000, targetPlayers);
+	}
+
+	private static ArrayList<City> getTargets(int continent, int x, int y, int radius, int value,
+			String... targetPlayers) {
 		ArrayList<City> targets = new ArrayList<>();
 		for (String player : targetPlayers) {
 			for (Alliance a : Constants.curr_alliances) {
@@ -464,8 +469,9 @@ public class AttackCreator {
 					for (Player p : a.players) {
 						if (p.name.equals(player)) {
 							for (City c : p.cities) {
-								if (c.isCastle && c.isWater && (c.continent == -1 || c.continent == continent)
-										&& c.score >= 5000) {
+								if (c.isCastle && c.isWater && (c.continent == -1 || c.continent == continent 
+//										|| (c.continent == 54 && c.score > 8000) /* TODO */
+										&& c.score >= value)) {
 									if ((x != -1 && y != -1)
 											|| Math.abs(c.x_coord - x) > radius && Math.abs(c.y_coord - y) > radius)
 										targets.add(c);
@@ -484,9 +490,11 @@ public class AttackCreator {
 		ArrayList<City> targets = new ArrayList<>();
 		for (Player p : targetPlayers.players) {
 			for (City c : p.cities) {
-				if (c.isCastle && c.isWater && (c.continent == -1 || c.continent == continent) && c.score >= 5000) {
+				if (c.isCastle && c.isWater && (c.continent == 54 || c.continent == continent) && c.score >= 5000) {
 					if ((x != -1 && y != -1) || Math.abs(c.x_coord - x) > radius && Math.abs(c.y_coord - y) > radius)
-						if(EXCLUDED_TARGETS.equals("") || !EXCLUDED_TARGETS.contains(c.coords(City.COORDS_VERSION_SIMPLE))) {
+						if (EXCLUDED_TARGETS.equals("")
+								|| (!EXCLUDED_TARGETS.contains(c.coords(City.COORDS_VERSION_SIMPLE))
+										|| !EXCLUDED_TARGETS.contains(c.player))) {
 							targets.add(c);
 						}
 				}
@@ -812,8 +820,32 @@ public class AttackCreator {
 
 	public static Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> simpleAttack(String alliance,
 			int continent, Map<String, AttackTypes> attacks, int warships, int assaults) {
-		Alliance targets = Constants.findAlliance(alliance);
-		ArrayList<City> cities = getTargets(continent, -1, -1, -1, targets);
+		return simpleAttack(alliance, continent, attacks, warships, assaults, false);
+	}
+
+	public static Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> simpleAttack(String alliance,
+			int continent, Map<String, AttackTypes> attacks, int warships, int assaults, boolean senator_assault) {
+		return simpleAttack(
+				Arrays.stream(Constants.playerAlliance(alliance, EXCLUDED_TARGETS))
+						.filter(s -> (s != null && s.length() > 0)).toArray(String[]::new),
+				continent, attacks, warships, assaults, 4000, senator_assault);
+	}
+
+	public static Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> simpleAttack(String alliance,
+			int continent, Map<String, AttackTypes> attacks, int warships, int assaults, int value,
+			boolean senator_assault) {
+		return simpleAttack(
+				Arrays.stream(Constants.playerAlliance(alliance, EXCLUDED_TARGETS))
+						.filter(s -> (s != null && s.length() > 0)).toArray(String[]::new),
+				continent, attacks, warships, assaults, value, senator_assault);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> simpleAttack(String[] players,
+			int continent, Map<String, AttackTypes> attacks, int warships, int assaults, int value,
+			boolean senator_assault) {
+		ArrayList<City> cities = getTargets(continent, -1, -1, -1, value, players);
+		System.out.println(cities.size());
 
 		Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> target = new HashMap<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>>();
 
@@ -824,20 +856,34 @@ public class AttackCreator {
 			ass += at.getAssault();
 		}
 
-		int num_of_reals = Math.min(ass / assaults, Math.min(ws / warships, cities.size()));
+		int num_of_reals = 0;
+		if (assaults == 0)
+			num_of_reals = Math.min(ws / warships, cities.size());
+		else if (warships == 0)
+			num_of_reals = Math.min(ass / assaults, cities.size());
+		else
+			num_of_reals = Math.min(ass / assaults, Math.min(ws / warships, cities.size()));
 
 		System.out.println("Number of reals: " + num_of_reals);
 
 		Map<City, AttackTypes> reals = new HashMap<City, AttackTypes>();
 		Map<City, AttackTypes> fakes = new HashMap<City, AttackTypes>();
 
+		// TODO: THIS IS AN EXTREME ADJUSTMENT...
 		while (num_of_reals > 0) {
 			int index = random.nextInt(cities.size());
+			for (int i = 0; i < cities.size(); i++) {
+				index = i;
+				break;
+			}
+			
 			reals.put(cities.remove(index), new AttackTypes());
 			num_of_reals--;
 		}
+		// TODO: THIS IS AN EXTREME ADJUSTMENT...
 
 		while (!cities.isEmpty()) {
+			if(fakes.size() > 40) break;
 			fakes.put(cities.remove(0), new AttackTypes());
 		}
 
@@ -860,14 +906,17 @@ public class AttackCreator {
 				// Add reals and fakes
 				// first dealing with WS/SEN
 				for (int i = 0; i < x.getValue().ws_with_sen; i++) {
-					wsAddSenSiegeOrSiege(reals, fakes, warships, x.getKey(), target);
+					if(!senator_assault)
+						wsAddSenSiegeOrSiege(reals, fakes, warships, x.getKey(), target);
+					else
+						wsAddSiege(reals, fakes, warships + 1, x.getKey(), target);
 				}
 
 				x.getValue().ws_with_sen = 0;
 
 				// next dealing with pure WS
 				for (int i = 0; i < x.getValue().ws + x.getValue().ws_with_sen; i++) {
-					wsAddSiege(reals, fakes, warships, x.getKey(), target);
+					wsAddSiege(reals, fakes, (senator_assault?warships+1:warships), x.getKey(), target);
 				}
 				x.getValue().ws = 0;
 
@@ -876,37 +925,60 @@ public class AttackCreator {
 
 				// Add reals and fakes
 				// first dealing with VANQ
+				if (x.getValue().vanq_with_sen > 0 && senator_assault) {
+					for (int i = 0; i < x.getValue().vanq_with_sen; i++) {
+						vanqAddSenatorOrAssaultReal(reals, fakes, assaults, x.getKey(), target);
+					}
+					x.getValue().vanq_with_sen = 0;
+				}
 				for (int i = 0; i < x.getValue().vanq + x.getValue().vanq_with_sen; i++) {
-					vanqAddAssaultReal(reals, fakes, assaults, x.getKey(), target);
+					vanqAddAssaultReal(reals, fakes, assaults, x.getKey(), target, senator_assault);
 				}
 				x.getValue().vanq = 0;
 				x.getValue().vanq_with_sen = 0;
 
-				for (int i = 0; i < x.getValue().sorc + x.getValue().sorc_with_sen; i++) {
-					sorcAddAssaultReal(reals, fakes, assaults, x.getKey(), target);
+				if (x.getValue().sorc_with_sen > 0 && senator_assault) {
+					for (int i = 0; i < x.getValue().sorc_with_sen; i++) {
+						sorcAddSenatorOrAssaultReal(reals, fakes, assaults, x.getKey(), target);
+					}
+					x.getValue().sorc_with_sen = 0;
 				}
-
+				for (int i = 0; i < x.getValue().sorc + x.getValue().sorc_with_sen; i++) {
+					sorcAddAssaultReal(reals, fakes, assaults, x.getKey(), target, senator_assault);
+				}
 				x.getValue().sorc = 0;
 				x.getValue().sorc_with_sen = 0;
 
+				if (x.getValue().horse_with_sen > 0 && senator_assault) {
+					for (int i = 0; i < x.getValue().horse_with_sen; i++) {
+						horseAddSenatorOrAssaultReal(reals, fakes, assaults, x.getKey(), target);
+					}
+					x.getValue().horse_with_sen = 0;
+				}
 				for (int i = 0; i < x.getValue().horse + x.getValue().horse_with_sen; i++) {
-					horseAddAssaultReal(reals, fakes, assaults, x.getKey(), target);
+					horseAddAssaultReal(reals, fakes, assaults, x.getKey(), target, senator_assault);
 				}
-
-				x.getValue().horse = 0;
 				x.getValue().horse_with_sen = 0;
+				x.getValue().horse = 0;
 
-				for (int i = 0; i < x.getValue().druid + x.getValue().druid_with_sen; i++) {
-					druidAddAssaultReal(reals, fakes, assaults, x.getKey(), target);
+				if (x.getValue().druid_with_sen > 0 && senator_assault) {
+					for (int i = 0; i < x.getValue().druid_with_sen; i++) {
+						druidAddSenatorOrAssaultReal(reals, fakes, assaults, x.getKey(), target);
+					}
+					x.getValue().druid_with_sen = 0;
 				}
-
-				x.getValue().druid = 0;
+				for (int i = 0; i < x.getValue().druid + x.getValue().druid_with_sen; i++) {
+					druidAddAssaultReal(reals, fakes, assaults, x.getKey(), target, senator_assault);
+				}
 				x.getValue().druid_with_sen = 0;
+				x.getValue().druid = 0;
 
 			}
 
 			if (x.getValue().getFakes() > 0) {
-				// Add fakes ...
+				for (int i = 0; i < x.getValue().fakes; i++) {
+					addFakes(reals, fakes, x.getKey(), target);
+				}
 			}
 		}
 
@@ -916,12 +988,168 @@ public class AttackCreator {
 		System.out.println("Extra ws: " + extra_ws);
 		System.out.println("Extra ass: " + extra_ass);
 
+		System.out.println("Total attacks: " + sumMaps(reals, fakes));
+
 		return target;
 
 	}
 
+	private static void addFakes(Map<City, AttackTypes> reals, Map<City, AttackTypes> fakes, String string,
+			Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> target) {
+		Pair<City, ArrayList<City>> pair = new Pair<City, ArrayList<City>>(null, new ArrayList<City>());
+		addFakesForFakes(reals, fakes, string, pair);
+		target.get(string).add(new Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>(ATTACK_TYPES.FAKE, pair));
+	}
+
+	private static void vanqAddSenatorOrAssaultReal(Map<City, AttackTypes> reals, Map<City, AttackTypes> fakes,
+			int assaults, String string,
+			Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> target) {
+
+		// first go through trying to set sen siege...
+		for (Entry<City, AttackTypes> e : reals.entrySet()) {
+			if (!e.getValue().hasSenator()) {
+				e.getValue().vanq_with_sen++;
+				Pair<City, ArrayList<City>> pair = new Pair<City, ArrayList<City>>(e.getKey(), new ArrayList<City>());
+				addFakesForReal(reals, fakes, string, pair);
+				target.get(string)
+						.add(new Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>(ATTACK_TYPES.VANQ_SEN_SIEGE, pair));
+				return;
+			}
+		}
+
+		for (Entry<City, AttackTypes> e : reals.entrySet()) {
+			if (e.getValue().getAssault() < assaults) {
+				e.getValue().vanq++;
+				Pair<City, ArrayList<City>> pair = new Pair<City, ArrayList<City>>(e.getKey(), new ArrayList<City>());
+				addFakesForReal(reals, fakes, string, pair);
+				target.get(string)
+						.add(new Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>(ATTACK_TYPES.VANQ_ASSAULT, pair));
+				return;
+			}
+		}
+
+		// If only require fakes left...
+		Pair<City, ArrayList<City>> pair = new Pair<City, ArrayList<City>>(null, new ArrayList<City>());
+		addFakesForFakes(reals, fakes, string, pair);
+		target.get(string).add(new Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>(ATTACK_TYPES.VANQ_ASSAULT, pair));
+		extra_ass++;
+	}
+
+	private static void sorcAddSenatorOrAssaultReal(Map<City, AttackTypes> reals, Map<City, AttackTypes> fakes,
+			int assaults, String string,
+			Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> target) {
+
+		// first go through trying to set sen siege...
+		for (Entry<City, AttackTypes> e : reals.entrySet()) {
+			if (!e.getValue().hasSenator()) {
+				e.getValue().sorc_with_sen++;
+				Pair<City, ArrayList<City>> pair = new Pair<City, ArrayList<City>>(e.getKey(), new ArrayList<City>());
+				addFakesForReal(reals, fakes, string, pair);
+				target.get(string)
+						.add(new Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>(ATTACK_TYPES.SORC_SEN_SIEGE, pair));
+				return;
+			}
+		}
+
+		for (Entry<City, AttackTypes> e : reals.entrySet()) {
+			if (e.getValue().getAssault() < assaults) {
+				e.getValue().sorc++;
+				Pair<City, ArrayList<City>> pair = new Pair<City, ArrayList<City>>(e.getKey(), new ArrayList<City>());
+				addFakesForReal(reals, fakes, string, pair);
+				target.get(string)
+						.add(new Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>(ATTACK_TYPES.SORC_ASSAULT, pair));
+				return;
+			}
+		}
+
+		// If only require fakes left...
+		Pair<City, ArrayList<City>> pair = new Pair<City, ArrayList<City>>(null, new ArrayList<City>());
+		addFakesForFakes(reals, fakes, string, pair);
+		target.get(string).add(new Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>(ATTACK_TYPES.SORC_ASSAULT, pair));
+		extra_ass++;
+	}
+
+	private static void druidAddSenatorOrAssaultReal(Map<City, AttackTypes> reals, Map<City, AttackTypes> fakes,
+			int assaults, String string,
+			Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> target) {
+
+		// first go through trying to set sen siege...
+		for (Entry<City, AttackTypes> e : reals.entrySet()) {
+			if (!e.getValue().hasSenator()) {
+				e.getValue().druid_with_sen++;
+				Pair<City, ArrayList<City>> pair = new Pair<City, ArrayList<City>>(e.getKey(), new ArrayList<City>());
+				addFakesForReal(reals, fakes, string, pair);
+				target.get(string)
+						.add(new Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>(ATTACK_TYPES.DRUID_SEN_SIEGE, pair));
+				return;
+			}
+		}
+
+		for (Entry<City, AttackTypes> e : reals.entrySet()) {
+			if (e.getValue().getAssault() < assaults) {
+				e.getValue().druid++;
+				Pair<City, ArrayList<City>> pair = new Pair<City, ArrayList<City>>(e.getKey(), new ArrayList<City>());
+				addFakesForReal(reals, fakes, string, pair);
+				target.get(string)
+						.add(new Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>(ATTACK_TYPES.DRUID_ASSAULT, pair));
+				return;
+			}
+		}
+
+		// If only require fakes left...
+		Pair<City, ArrayList<City>> pair = new Pair<City, ArrayList<City>>(null, new ArrayList<City>());
+		addFakesForFakes(reals, fakes, string, pair);
+		target.get(string).add(new Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>(ATTACK_TYPES.DRUID_ASSAULT, pair));
+		extra_ass++;
+	}
+
+	private static void horseAddSenatorOrAssaultReal(Map<City, AttackTypes> reals, Map<City, AttackTypes> fakes,
+			int assaults, String string,
+			Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> target) {
+
+		// first go through trying to set sen siege...
+		for (Entry<City, AttackTypes> e : reals.entrySet()) {
+			if (!e.getValue().hasSenator()) {
+				e.getValue().horse_with_sen++;
+				Pair<City, ArrayList<City>> pair = new Pair<City, ArrayList<City>>(e.getKey(), new ArrayList<City>());
+				addFakesForReal(reals, fakes, string, pair);
+				target.get(string)
+						.add(new Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>(ATTACK_TYPES.HORSE_SEN_SIEGE, pair));
+				return;
+			}
+		}
+
+		for (Entry<City, AttackTypes> e : reals.entrySet()) {
+			if (e.getValue().getAssault() < assaults) {
+				e.getValue().horse++;
+				Pair<City, ArrayList<City>> pair = new Pair<City, ArrayList<City>>(e.getKey(), new ArrayList<City>());
+				addFakesForReal(reals, fakes, string, pair);
+				target.get(string)
+						.add(new Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>(ATTACK_TYPES.HORSE_ASSAULT, pair));
+				return;
+			}
+		}
+
+		// If only require fakes left...
+		Pair<City, ArrayList<City>> pair = new Pair<City, ArrayList<City>>(null, new ArrayList<City>());
+		addFakesForFakes(reals, fakes, string, pair);
+		target.get(string).add(new Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>(ATTACK_TYPES.HORSE_ASSAULT, pair));
+		extra_ass++;
+	}
+
+	private static int sumMaps(@SuppressWarnings("unchecked") Map<City, AttackTypes>... reals) {
+		int ret = 0;
+		for (int i = 0; i < reals.length; i++) {
+			for (AttackTypes t : reals[i].values()) {
+				ret += t.getTotal();
+			}
+		}
+		return ret;
+	}
+
 	private static void horseAddAssaultReal(Map<City, AttackTypes> reals, Map<City, AttackTypes> fakes, int assaults,
-			String string, Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> target) {
+			String string, Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> target,
+			boolean senatorCheck) {
 		for (Entry<City, AttackTypes> e : reals.entrySet()) {
 			if (e.getValue().getAssault() < assaults) {
 				e.getValue().horse++;
@@ -941,7 +1169,8 @@ public class AttackCreator {
 	}
 
 	private static void druidAddAssaultReal(Map<City, AttackTypes> reals, Map<City, AttackTypes> fakes, int assaults,
-			String string, Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> target) {
+			String string, Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> target,
+			boolean senatorCheck) {
 		for (Entry<City, AttackTypes> e : reals.entrySet()) {
 			if (e.getValue().getAssault() < assaults) {
 				e.getValue().druid++;
@@ -961,7 +1190,8 @@ public class AttackCreator {
 	}
 
 	private static void vanqAddAssaultReal(Map<City, AttackTypes> reals, Map<City, AttackTypes> fakes, int assaults,
-			String string, Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> target) {
+			String string, Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> target,
+			boolean senatorCheck) {
 		for (Entry<City, AttackTypes> e : reals.entrySet()) {
 			if (e.getValue().getAssault() < assaults) {
 				e.getValue().vanq++;
@@ -981,7 +1211,8 @@ public class AttackCreator {
 	}
 
 	private static void sorcAddAssaultReal(Map<City, AttackTypes> reals, Map<City, AttackTypes> fakes, int assaults,
-			String string, Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> target) {
+			String string, Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> target,
+			boolean senatorCheck) {
 		for (Entry<City, AttackTypes> e : reals.entrySet()) {
 			if (e.getValue().getAssault() < assaults) {
 				e.getValue().sorc++;
@@ -1111,14 +1342,18 @@ public class AttackCreator {
 
 	private static City lowestIndex(Map<City, AttackTypes> reals, Map<City, AttackTypes> fakes) {
 		City lowest = null;
-		int value = Integer.MAX_VALUE;
-		for (Entry<City, AttackTypes> e : reals.entrySet()) {
-			if (e.getValue().getTotal() < value) {
-				lowest = e.getKey();
-				value = e.getValue().getTotal();
-			}
-		}
+		int value = Integer.MAX_VALUE; // start with fakes to fill them up
+										// first...
 		for (Entry<City, AttackTypes> e : fakes.entrySet()) {
+			int i = e.getValue().getTotal();
+			if(i < value) {
+				lowest = e.getKey();
+				value = i;
+			}
+			
+		}
+		
+		for (Entry<City, AttackTypes> e : reals.entrySet()) {
 			if (e.getValue().getTotal() < value) {
 				lowest = e.getKey();
 				value = e.getValue().getTotal();
@@ -1139,30 +1374,33 @@ public class AttackCreator {
 
 	public static void main(String[] args) {
 
-		useSeed(-5509912525257982218L);
 		// Scanner scanner = new Scanner(System.in);
 
 		// All the attackers inputs. Can do this with csv sheet. Need to test.
 		Map<String, AttackTypes> attackersV2 = new HashMap<>();
-		attackersV2 = csvToAttackers("src/cotg/data/DATA.csv");
+		// 123 = only assaults
+		// 1234 = only WS
+		attackersV2 = csvToAttackers("src/cotg/data/DATA.csv", -1);
 
-		EXCLUDED_TARGETS = "";
+		Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> x = null;
+		int warships = 0;
+		int assults = 13;
+		int continent_to_attack = 22;
+		int number_of_attacks = 0;
+		x = simpleAttack("ALLIANCE", continent_to_attack, attackersV2, warships, assults, number_of_attacks, true);
 
-		Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> x = simpleAttack(Constants.BSR, 54,
-				attackersV2, 3, 5);
+		// x = simpleAttack(new String[] { "whitehot", "NardosASR", "Wrothar",
+		// "Archemenos", "ReiDeDeuses", "dinamik",
+		// "Lordziggy", "phuddydhuddy" }, 54, attackersV2, 0, 6, true);
+		// useSeed(-6160508199884610223L);
+		// attackersV2 = csvToAttackers("src/cotg/data/DATA.csv", 1234);
+		// EXCLUDED_TARGETS = "whitehot, NardosASR, Wrothar, Archemenos,
+		// ReiDeDeuses, dinamik, Lordziggy, phuddydhuddy";
+		// x = simpleAttack(Constants.BSR, 54, attackersV2, 4, 6, false);
+
+		// combine x and x2
 		ByteArrayOutputStream os = gatherPrintlnOutput();
 		print(x);
-
-		// int x = -1, y = -1, radius = -1;
-		// Map<String, Pair<ArrayList<ArrayList<Pair<String, City>>>,
-		// ArrayList<ArrayList<Pair<String, City>>>>>
-		// waterTargetsByNameAndContinent =
-		// getWaterTargetsByAllianceAndContinentV2(
-		// attackersV2, 03, x, y, radius, Constants.DMC);
-		// printAttacksByTargets(waterTargetsByNameAndContinent);
-
-		// System.out.println(printSimpleTargets(waterTargetsByNameAndContinent));
-
 		System.out.println(AttackCreator.seed);
 
 		try {
@@ -1186,8 +1424,21 @@ public class AttackCreator {
 
 	}
 
-	public final static String month = "01";
-	public final static String day = "12";
+	private static Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> combineOrders(
+			Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> x,
+			Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> x2) {
+		Map<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>> ret = new HashMap<String, ArrayList<Pair<ATTACK_TYPES, Pair<City, ArrayList<City>>>>>();
+
+		for (String player : x.keySet()) {
+			ret.put(player, x.get(player));
+			ret.get(player).addAll(x2.get(player));
+		}
+
+		return ret;
+	}
+
+	public final static String month = "03";
+	public final static String day = "03";
 	public final static int hour = 10;
 	public final static String min = "00";
 
@@ -1307,9 +1558,10 @@ public class AttackCreator {
 	 * Capable] 11 Warship Castles [Not Senator Capable] 12 Sorcerer/Galley
 	 * Castles [Not Senator Capable]
 	 */
-	public static Map<String, AttackTypes> csvToAttackers(String file) {
+	public static Map<String, AttackTypes> csvToAttackers(String file, int type) {
 		ArrayList<String> rows = Parser.parseFiles(file);
 		Map<String, AttackTypes> ret = new HashMap<String, AttackTypes>();
+		// int count = 0;
 
 		for (int i = 1; i < rows.size(); i++) {
 			rows.set(i, rows.get(i).replaceAll(",", " , "));
@@ -1330,12 +1582,25 @@ public class AttackCreator {
 			int ws_sen = getInt(column[10]);
 			int ws = getInt(column[11]);
 			int fake = getInt(column[12]) + getInt(column[13]);
-			fake = 0;
 
 			AttackTypes curr = new AttackTypes(vanq_sen, vanq, sorc_sen, sorc, horse_sen, horse, druid_sen, druid,
 					ws_sen, ws, fake);
+			// ONLY ASSAULTS
+			if (type == 1) {
+				curr = new AttackTypes(vanq_sen, vanq, sorc_sen, sorc, horse_sen, horse, druid_sen, druid, ws_sen, ws,
+						0);
+			}
+			if (type == 123) {
+				curr = new AttackTypes(vanq_sen, vanq, sorc_sen, sorc, horse_sen, horse, druid_sen, druid, 0, 0, 0);
+			}
+			// ONLY WS && FAKES
+			if (type == 1234) {
+				curr = new AttackTypes(0, 0, 0, 0, 0, 0, 0, 0, ws_sen, ws, fake);
+			}
 			ret.put(name, curr);
+			// count+=curr.getAssault();
 		}
+		// System.out.println(count);
 
 		return ret;
 	}

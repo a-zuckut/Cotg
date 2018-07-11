@@ -3,6 +3,7 @@ package cotg.data;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
@@ -97,17 +98,21 @@ public class Constants {
 		return null;
 	}
 
-	public static final String WPH = "Wolf Pack & Horizon";
-	public static final String DMC = "Dirty Mastiff Cartel";
-	public static final String BSR = "Black Sail Reapers";
-
 	public static void main(String[] args) {
-		// printCastlesInContinentForAlliance(WPH, 03);
-//		printLandCastlesForAllianceContinent(DMC, 03);
-		printWaterCastlesForAllianceContinent(DMC, 03);
-		printWaterCastlesForAllianceContinent(BSR, 54);
+		String alliance_name = "The Wolf Pack";
+		 printWaterCastlesPerContinentPerPersonPerAlliance(alliance_name, 45);
+		 printWaterCastlesForAllianceContinent(alliance_name, 45);
 
-		printWaterCastlesForAllianceContinent(BSR, 43);
+//		for (int i = 0; i < 56; i++) {
+//			printWaterCastlesForAllianceContinent(BSR, i);
+//		}
+		
+//		for(int i = 0; i < 56; i++) {
+//			printWaterTemplesForAllianceContinent(BSR, i);
+//		}
+		//
+		 printCastlesInContinentForAlliance(alliance_name, 45);
+		// printPercentCastleContinentAlliance(BSR, 45);
 	}
 
 	public static void printWaterCastlesForPlayerOnContinent(String player, int continent) {
@@ -148,6 +153,50 @@ public class Constants {
 
 	}
 
+	public static void printPercentCastleContinentAlliance(String alliance, int continent) {
+		Alliance alliance2 = Constants.findAlliance(alliance);
+		for (Player p : alliance2.players) {
+			if (p.onContinent(continent)) {
+				int cities = 0;
+				int castles = 0;
+				for (City c : p.cities) {
+					if (c.continent == continent) {
+						cities++;
+						if (c.isCastle)
+							castles++;
+					}
+				}
+				System.out.printf("Player %s has %.1f%% castles on %d\n", p.name,
+						100 * (double) (castles * 1.0 / (cities * 1.0)), continent);
+			}
+		}
+	}
+
+	public static void printWaterCastlesPerContinentPerPersonPerAlliance(String alliance, int continent) {
+		Alliance alliance2 = findAlliance(alliance);
+
+		System.out.println(alliance + " on " + continent);
+
+		if (alliance2 == null)
+			return;
+
+		int countT = 0;
+		for (Player p : alliance2.players) {
+			int count = 0;
+			for (City c : p.cities) {
+				if (c.continent == continent && c.isCastle && c.isWater) {
+					count++;
+					// System.out.println(c);
+				}
+			}
+			if (count > 0) {
+				System.out.println(p.name + ": " + count);
+				countT += count;
+			}
+		}
+		System.out.println("Total: " + countT);
+	}
+
 	public static void printCastlesInContinentForAlliance(String alliance, int continent) {
 		Alliance alliance2 = findAlliance(alliance);
 
@@ -158,12 +207,12 @@ public class Constants {
 		for (Player p : alliance2.players) {
 			for (City c : p.cities) {
 				if (c.continent == continent && c.isCastle) {
-					System.out.println(c);
+//					System.out.println(c);
 					count++;
 				}
 			}
 		}
-		System.out.println(count);
+		System.out.println(alliance + " on " + continent + ": " + count);
 	}
 
 	public static void printWaterCastlesForPlayer(String player) {
@@ -190,12 +239,32 @@ public class Constants {
 		for (Player p : alliance2.players) {
 			for (City c : p.cities) {
 				if (c.continent == continent && c.isCastle && c.isWater) {
-//					System.out.println(p.name + "\t" + c.coords());
+					// System.out.println(p.name + "\t" + c.coords());
 					count++;
 				}
 			}
 		}
-		System.out.println(count);
+		if (count > 0)
+			System.out.println(alliance + " on " + continent + ": " + count);
+	}
+
+	public static void printWaterTemplesForAllianceContinent(String alliance, int continent) {
+		Alliance alliance2 = findAlliance(alliance);
+
+		if (alliance2 == null)
+			return;
+
+		int count = 0;
+		for (Player p : alliance2.players) {
+			for (City c : p.cities) {
+				if (c.continent == continent && c.isCastle && c.isWater && c.isTemple) {
+					 System.out.println(p.name + "\t" + c.coords());
+					count++;
+				}
+			}
+		}
+		if (count > 0)
+			System.out.println(alliance + " on " + continent + ": " + count);
 	}
 
 	public static void printLandCastlesForAllianceContinent(String alliance, int continent) {
@@ -280,6 +349,21 @@ public class Constants {
 		for (Map.Entry<String, Pair<Integer, Integer>> e : sortedset) {
 			System.out.printf("%15s\t%15s\t%15s\t\n", e.getKey(), e.getValue().p2, e.getValue().p1);
 		}
+	}
+
+	public static String[] playerAlliance(String alliance) {
+		return playerAlliance(alliance, "");
+	}
+
+	public static String[] playerAlliance(String alliance, String exclude) {
+		Alliance a = findAlliance(alliance);
+		String[] xStrings = new String[a.players.size()];
+		int i = 0;
+		for (Player p : a.players) {
+			if (!exclude.contains(p.name))
+				xStrings[i++] = p.name;
+		}
+		return xStrings;
 	}
 
 }

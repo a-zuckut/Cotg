@@ -1,32 +1,48 @@
 ranking,continent,alliance,total_%,evara,vexemis,ibria,merius,ylanna,naera,cyndros,domdis,levels
-1,1,Dirty Mastiff Cartel,3,-,-,3%(1),-,-,-,-,-,1
-1,2,Dirty Mastiff Cartel,6,-,-,-,-,-,6%(2),-,-,2
-1,3,Wolf Pack & Horizon,4,-,-,-,-,-,4%(1),-,-,1
-1,4,Dirty Mastiff Cartel,2,-,-,-,-,-,-,2%(1),-,1
-1,12,Black Sail Reapers,11,-,-,-,-,-,6%(2),-,5%(1),3
-1,11,Black Sail Reapers,10,-,-,-,-,-,-,10%(1),-,1
-1,13,Wolf Pack & Horizon,5,-,-,-,3%(1),-,-,-,2%(1),2
-1,14,Dirty Mastiff Cartel,10,-,-,-,-,-,10%(2),-,-,2
-1,20,Black Sail Reapers,6,6%(1),-,-,-,-,-,-,-,1
-1,21,Black Sail Reapers,2,2%(1),-,-,-,-,-,-,-,1
-1,22,Black Sail Reapers,14,2%(1),-,-,-,-,12%(2),-,-,3
-2,22,Dirty Mastiff Cartel,10,8%(1),-,-,-,-,2%(1),-,-,2
-1,24,Wolf Pack & Horizon,13,-,-,-,-,13%(5),-,-,-,5
-1,23,Wolf Pack & Horizon,20,-,8%(3),-,12%(2),-,-,-,-,5
-1,25,Wolf Pack & Horizon,6,-,-,6%(4),-,-,-,-,-,4
-1,30,Black Sail Reapers,5,-,-,5%(1),-,-,-,-,-,1
-1,31,Dirty Mastiff Cartel,7,-,-,-,-,7%(1),-,-,-,1
-2,31,Wild Ones All Hail,2,-,-,-,-,2%(1),-,-,-,1
-1,32,Dirty Mastiff Cartel,11,-,-,4%(2),-,7%(2),-,-,-,4
-1,34,Wolf Pack & Horizon,14,-,-,-,13%(3),1%(1),-,-,-,4
-1,33,Wolf Pack & Horizon,15,-,8%(1),-,-,-,-,7%(2),-,3
-1,35,Wolf Pack & Horizon,9,-,-,-,-,-,-,9%(4),-,4
-1,41,Black Sail Reapers,5,-,-,5%(1),-,-,-,-,-,1
-1,42,Black Sail Reapers,5,-,-,2%(1),-,3%(1),-,-,-,2
-1,43,Black Sail Reapers,7,-,-,-,-,-,-,4%(2),3%(2),4
-1,44,Wolf Pack & Horizon,7,-,7%(5),-,-,-,-,-,-,5
-1,51,Wild Ones All Hail,1,1%(1),-,-,-,-,-,-,-,1
-1,52,Wolf Pack & Horizon,3,-,-,3%(1),-,-,-,-,-,1
-1,53,Wolf Pack & Horizon,8,-,-,-,-,8%(2),-,-,-,2
-1,54,Black Sail Reapers,1,1%(1),-,-,-,-,-,-,-,1
+1,0,Dirty Mastiff Cartel,14,-,2%(1),-,5%(1),-,-,-,7%(4),6
+1,1,Dirty Mastiff Cartel,42,18%(6),-,19%(2),-,5%(2),-,-,-,10
+1,3,Dirty Mastiff Cartel,30,-,4%(2),-,-,-,10%(2),-,16%(4),8
+1,2,Dirty Mastiff Cartel,45,16%(4),4%(2),-,-,-,25%(2),-,-,8
+1,4,Dirty Mastiff Cartel,47,-,-,-,5%(2),-,17%(5),25%(6),-,13
+1,10,Black Sail Reapers,25,3%(1),-,-,11%(4),-,11%(3),-,-,8
+2,10,Wolf Pack & Horizon,1,-,-,-,1%(1),-,-,-,-,1
+3,10,Marshmallows,1,-,-,-,1%(1),-,-,-,-,1
+1,5,Dirty Mastiff Cartel,26,-,-,-,4%(1),10%(4),-,12%(4),-,9
+1,11,Black Sail Reapers,23,-,5%(2),8%(4),-,-,-,10%(2),-,8
+1,12,Black Sail Reapers,73,-,1%(1),-,-,-,33%(8),12%(2),27%(6),17
+1,13,Wolf Pack & Horizon,70,-,-,-,44%(10),10%(2),-,-,16%(3),15
+1,15,Dirty Mastiff Cartel,22,-,-,-,16%(2),-,2%(2),-,4%(2),6
+2,15,Wolf Pack & Horizon,3,-,-,-,-,-,3%(2),-,-,2
+1,14,Dirty Mastiff Cartel,42,-,-,4%(2),16%(4),-,22%(6),-,-,12
+1,21,Black Sail Reapers,34,21%(3),-,8%(2),-,-,-,-,5%(3),8
+2,21,Dirty Mastiff Cartel,5,-,-,-,-,-,-,-,5%(2),2
+1,20,Black Sail Reapers,59,39%(10),-,-,-,5%(2),-,15%(5),-,17
+1,24,Wolf Pack & Horizon,64,-,-,-,-,32%(8),6%(1),26%(8),-,17
+1,23,Wolf Pack & Horizon,82,-,27%(5),-,37%(4),-,15%(6),-,3%(2),17
+1,22,Black Sail Reapers,47,9%(2),-,-,1%(1),14%(3),23%(6),-,-,12
+2,22,Dirty Mastiff Cartel,35,20%(3),-,-,2%(2),1%(1),12%(3),-,-,9
+3,22,Marshmallows,1,-,-,-,1%(1),-,-,-,-,1
+1,25,Wolf Pack & Horizon,55,4%(2),-,36%(8),-,-,-,15%(2),-,12
+1,30,Black Sail Reapers,45,1%(1),-,24%(2),20%(6),-,-,-,-,9
+2,30,Marshmallows,1,-,-,-,-,-,1%(1),-,-,1
+3,30,Wild Ones All Hail,1,1%(1),-,-,-,-,-,-,-,1
+1,31,Dirty Mastiff Cartel,50,-,-,-,18%(5),27%(3),-,5%(2),-,10
+1,33,Wolf Pack & Horizon,57,-,28%(6),-,9%(1),1%(1),-,19%(3),-,11
+1,34,Wolf Pack & Horizon,47,-,-,-,24%(5),17%(2),6%(2),-,-,9
+1,32,Dirty Mastiff Cartel,85,9%(2),-,29%(7),-,44%(9),3%(1),-,-,19
+1,35,Wolf Pack & Horizon,59,-,-,-,-,-,-,40%(10),19%(6),16
+1,41,Black Sail Reapers,55,-,-,34%(9),-,-,5%(2),-,16%(2),13
+1,40,Black Sail Reapers,37,16%(2),-,-,-,-,16%(3),5%(1),-,6
+1,43,Black Sail Reapers,75,-,11%(5),-,-,-,-,38%(9),26%(8),22
+1,42,Black Sail Reapers,72,-,9%(4),32%(10),-,31%(8),-,-,-,22
+2,42,Dirty Mastiff Cartel,1,-,1%(1),-,-,-,-,-,-,1
+1,45,Wolf Pack & Horizon,22,3%(1),-,-,-,-,5%(2),14%(3),-,6
+2,45,Black Sail Reapers,2,-,-,-,-,-,-,2%(1),-,1
+1,44,Wolf Pack & Horizon,50,-,40%(10),-,-,-,1%(1),9%(1),-,12
+1,52,Wolf Pack & Horizon,36,-,11%(2),22%(3),-,-,-,-,3%(1),6
+1,50,Wolf Pack & Horizon,31,12%(5),-,5%(2),-,-,14%(6),-,-,13
+1,54,Black Sail Reapers,26,11%(3),4%(1),11%(2),-,-,-,-,-,6
 2,54,Wolf Pack & Horizon,1,1%(1),-,-,-,-,-,-,-,1
+1,53,Black Sail Reapers,26,-,5%(2),-,6%(3),15%(2),-,-,-,7
+1,55,Black Sail Reapers,20,9%(1),4%(1),7%(2),-,-,-,-,-,4
+1,51,Wild Ones All Hail,41,22%(5),-,-,-,16%(3),3%(1),-,-,9
